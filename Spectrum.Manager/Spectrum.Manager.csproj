@@ -50,6 +50,10 @@
       <Project>{a9cfd86d-1604-4c80-b02b-e60ad98ba86f}</Project>
       <Name>Spectrum.API</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Spectrum.Interop\Spectrum.Interop.csproj">
+      <Project>{77c20b4a-284c-4b3d-a5b5-b254e637fb47}</Project>
+      <Name>Spectrum.Interop</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

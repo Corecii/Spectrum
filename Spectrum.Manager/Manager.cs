@@ -2,10 +2,10 @@ using System;
 using System.IO;
 using Spectrum.API;
 using Spectrum.API.Configuration;
-using Spectrum.API.Game;
 using Spectrum.API.Interfaces.Plugins;
 using Spectrum.API.Interfaces.Systems;
 using Spectrum.API.Logging;
+using Spectrum.Interop.Game;
 using Spectrum.Manager.Input;
 using Spectrum.Manager.Managed;
 
