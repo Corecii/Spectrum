@@ -169,9 +169,9 @@ namespace Spectrum.Interop.Helpers
             {
                 try
                 {
-                    return (T)Convert.ChangeType(property.GetValue(o, null), typeof (T));
+                    return (T)Convert.ChangeType(property.GetValue(o, null), typeof(T));
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine($"API: Failed to get value of instance property {name}:\n{ex}");
                     return default(T);
