@@ -1,6 +1,7 @@
 using System;
 using Spectrum.Interop.Game.EventArgs.Vehicle;
 using Spectrum.Interop.Helpers;
+using Spectrum.Interop.Helpers.Extensions;
 using Spectrum.Interop.TypeWrappers;
 using UnityEngine;
 
@@ -237,10 +238,10 @@ namespace Spectrum.Interop.Game.Vehicle
             UpdateObjectReferences();
             if (CanOperateOnVehicle && VehicleLogic.CarLogicLocal_ != null)
             {
-                var jets = Utilities.Utilities.GetPrivate<JetsGadget>(VehicleLogic.CarLogicLocal_, "jetsGadget_");
+                var jets = Reflection.GetPrivate<JetsGadget>(VehicleLogic.CarLogicLocal_, "jetsGadget_");
                 if (jets != null)
                 {
-                    var flames = Utilities.Utilities.GetPrivate<JetFlame[]>(jets, "flames_");
+                    var flames = Reflection.GetPrivate<JetFlame[]>(jets, "flames_");
                         
                     foreach (var flame in flames)
                     {
@@ -255,7 +256,7 @@ namespace Spectrum.Interop.Game.Vehicle
             UpdateObjectReferences();
             if (CanOperateOnVehicle && VehicleLogic.CarLogicLocal_ != null)
             {
-                var booster = Utilities.Utilities.GetPrivate<BoostGadget>(VehicleLogic.CarLogicLocal_, "boostGadget_");
+                var booster = Reflection.GetPrivate<BoostGadget>(VehicleLogic.CarLogicLocal_, "boostGadget_");
                 if (booster != null)
                 {
                     foreach (var flame in booster.flames_)
@@ -271,15 +272,15 @@ namespace Spectrum.Interop.Game.Vehicle
             UpdateObjectReferences();
             if (CanOperateOnVehicle && VehicleLogic.CarLogicLocal_ != null)
             {
-                var wingsGadget = Utilities.Utilities.GetPrivate<WingsGadget>(VehicleLogic.CarLogicLocal_, "wingsGadget_");
+                var wingsGadget = Reflection.GetPrivate<WingsGadget>(VehicleLogic.CarLogicLocal_, "wingsGadget_");
                 if (wingsGadget != null)
                 {
-                    var wingTrailHelpers = Utilities.Utilities.GetPrivate<WingTrailHelper[]>(wingsGadget, "wingTrails_");
+                    var wingTrailHelpers = Reflection.GetPrivate<WingTrailHelper[]>(wingsGadget, "wingTrails_");
                     if (wingTrailHelpers != null)
                     {
                         foreach (var wingTrailHelper in wingTrailHelpers)
                         {
-                            var wingTrail = Utilities.Utilities.GetPrivate<WingTrail>(wingTrailHelper, "wingTrail_");
+                            var wingTrail = Reflection.GetPrivate<WingTrail>(wingTrailHelper, "wingTrail_");
                             if (wingTrail != null)
                             {
                                 wingTrail.GetComponent<Renderer>().material.color = hexColor.ToColor();
@@ -312,10 +313,10 @@ namespace Spectrum.Interop.Game.Vehicle
 
         private static void UpdateObjectReferences()
         {
-            VehicleLogic = Utilities.Utilities.FindLocalCar()?.GetComponent<CarLogic>();
+            VehicleLogic = Utilities.FindLocalCar()?.GetComponent<CarLogic>();
 
             if (VehicleLogic == null)
-                VehicleLogic = Utilities.Utilities.FindLocalCarLogic();
+                VehicleLogic = Utilities.FindLocalCarLogic();
         }
     }
 }

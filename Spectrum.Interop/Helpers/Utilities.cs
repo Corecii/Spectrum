@@ -1,7 +1,7 @@
 using System.Reflection;
 using UnityEngine;
 
-namespace Spectrum.Interop.Utilities
+namespace Spectrum.Interop.Helpers
 {
     internal static class Utilities
     {
@@ -23,18 +23,6 @@ namespace Spectrum.Interop.Utilities
                 return carScreenLogic;
             }
             return null;
-        }
-
-        internal static T GetPrivate<T>(object o, string fieldname)
-        {
-            var field = o.GetType().GetField(fieldname, BindingFlags.Instance | BindingFlags.NonPublic);
-            return (T) field?.GetValue(o);
-        }
-
-        internal static void SetPrivate<T>(object o, string fieldname, T value)
-        {
-            var field = o.GetType().GetField(fieldname, BindingFlags.Instance | BindingFlags.NonPublic);
-            field?.SetValue(o, value);
         }
     }
 }

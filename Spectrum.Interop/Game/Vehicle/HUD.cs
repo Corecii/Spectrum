@@ -1,3 +1,4 @@
+using Spectrum.Interop.Helpers;
 using UnityEngine;
 
 namespace Spectrum.Interop.Game.Vehicle
@@ -27,14 +28,14 @@ namespace Spectrum.Interop.Game.Vehicle
         public void Clear()
         {
             HoverScreenEmitter hse = GameObject.Find("LocalCar")?.GetComponent<HoverScreenEmitter>();
-            HoverScreenParent hsp = Utilities.Utilities.GetPrivate<HoverScreenParent>(hse, "hoverScreenParent_");
+            HoverScreenParent hsp = Reflection.GetPrivate<HoverScreenParent>(hse, "hoverScreenParent_");
             TrickyTextLogic ttl = hsp.rightTrickyTextObj_.GetComponent<TrickyTextLogic>();
-            Utilities.Utilities.GetPrivate<PriorityQueue<TrickyTextLogic.TrickText>>(ttl, "textList_").Clear();
+            Reflection.GetPrivate<PriorityQueue<TrickyTextLogic.TrickText>>(ttl, "textList_").Clear();
         }
 
         private void UpdateParentObject()
         {
-            var localCar = Utilities.Utilities.FindLocalCar();
+            var localCar = Utilities.FindLocalCar();
             HoverScreenEmitter = localCar?.GetComponent<HoverScreenEmitter>();
         }
     }

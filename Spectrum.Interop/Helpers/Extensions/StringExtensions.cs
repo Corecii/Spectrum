@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Text;
 using UnityEngine;
 
-namespace Spectrum.Interop.Helpers
+namespace Spectrum.Interop.Helpers.Extensions
 {
     public static class StringExtensions
     {

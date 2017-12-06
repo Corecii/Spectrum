@@ -1,4 +1,5 @@
 using Spectrum.Interop.Helpers;
+using Spectrum.Interop.Helpers.Extensions;
 
 namespace Spectrum.Interop.Game.Vehicle
 {
@@ -11,12 +12,12 @@ namespace Spectrum.Interop.Game.Vehicle
 
         internal Screen()
         {
-            VehicleScreenLogic = Utilities.Utilities.FindLocalVehicleScreen();
+            VehicleScreenLogic = Utilities.FindLocalVehicleScreen();
         }
 
         public void Clear()
         {
-            VehicleScreenLogic = Utilities.Utilities.FindLocalVehicleScreen();
+            VehicleScreenLogic = Utilities.FindLocalVehicleScreen();
 
             if (CanOperateOnScreen)
             {
@@ -26,7 +27,7 @@ namespace Spectrum.Interop.Game.Vehicle
 
         public void SetTimeBarText(string text, string hexColor, float time)
         {
-            VehicleScreenLogic = Utilities.Utilities.FindLocalVehicleScreen();
+            VehicleScreenLogic = Utilities.FindLocalVehicleScreen();
 
             if (CanOperateOnScreen)
             {
@@ -36,7 +37,7 @@ namespace Spectrum.Interop.Game.Vehicle
 
         public void StartFinalCountdown(float timeLeft)
         {
-            VehicleScreenLogic = Utilities.Utilities.FindLocalVehicleScreen();
+            VehicleScreenLogic = Utilities.FindLocalVehicleScreen();
 
             if (CanOperateOnScreen)
             {
@@ -46,7 +47,7 @@ namespace Spectrum.Interop.Game.Vehicle
 
         public void WriteText(string text, float perCharacterInterval, int clearDelayUnits, float displayDelay, bool clearOnEnd, string timeBarText)
         {
-            VehicleScreenLogic = Utilities.Utilities.FindLocalVehicleScreen();
+            VehicleScreenLogic = Utilities.FindLocalVehicleScreen();
 
             if (CanOperateOnScreen)
             {

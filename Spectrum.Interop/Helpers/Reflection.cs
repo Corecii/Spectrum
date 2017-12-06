@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Spectrum.Interop.Utilities
+namespace Spectrum.Interop.Helpers
 {
-    public class Interop
+    public class Reflection
     {
         public static MethodInfo GetMethod(object o, string name, bool isStatic)
         {
@@ -180,6 +180,18 @@ namespace Spectrum.Interop.Utilities
 
             Console.WriteLine($"API: Property {name} does not exist in the specified object.");
             return default(T);
+        }
+
+        internal static T GetPrivate<T>(object o, string fieldname)
+        {
+            var field = o.GetType().GetField(fieldname, BindingFlags.Instance | BindingFlags.NonPublic);
+            return (T)field?.GetValue(o);
+        }
+
+        internal static void SetPrivate<T>(object o, string fieldname, T value)
+        {
+            var field = o.GetType().GetField(fieldname, BindingFlags.Instance | BindingFlags.NonPublic);
+            field?.SetValue(o, value);
         }
     }
 }
