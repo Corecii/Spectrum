@@ -217,11 +217,11 @@ namespace Spectrum.Interop.Game.Vehicle
                 }
             });
 
-            Events.Car.WingsAbilityStateChanged.SubscribeAll((sender, data) =>
+            Events.Car.WingsStateChange.SubscribeAll((sender, data) =>
             {
                 if (sender.GetComponent<PlayerDataLocal>())
                 {
-                    if (data.enabled_)
+                    if (data.open_)
                     {
                         WingsEnabled?.Invoke(null, System.EventArgs.Empty);
                     }
@@ -289,16 +289,6 @@ namespace Spectrum.Interop.Game.Vehicle
                     }
                 }
             }
-        }
-
-        public static void EnableInfectionVisuals()
-        {
-            VehicleLogic.ShowInfection(true);
-        }
-
-        public static void DisableInfectionVisuals()
-        {
-            VehicleLogic.ShowInfection(false);
         }
 
         public static void EnableInfiniteCooldown()

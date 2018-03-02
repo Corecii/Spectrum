@@ -31,17 +31,7 @@ namespace Spectrum.Interop.Game.Vehicle
 
             if (CanOperateOnScreen)
             {
-                VehicleScreenLogic.timeWidget_?.SetTimeText(text, hexColor.ToColor(), time);
-            }
-        }
-
-        public void StartFinalCountdown(float timeLeft)
-        {
-            VehicleScreenLogic = Utilities.FindLocalVehicleScreen();
-
-            if (CanOperateOnScreen)
-            {
-                VehicleScreenLogic.SetFinalCountdown(timeLeft);
+                VehicleScreenLogic.timeWidget_?.SetTimeTextToString(text, hexColor.ToColor(), time);
             }
         }
 
