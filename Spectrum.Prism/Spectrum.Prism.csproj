@@ -42,6 +42,7 @@
     <Compile Include="IO\ColoredOutput.cs" />
     <Compile Include="IO\ModuleWriter.cs" />
     <Compile Include="Patches\DevModeEnablePatch.cs" />
+    <Compile Include="Patches\DiscordRPCPatch.cs" />
     <Compile Include="Patches\SpectrumUpdateCodePatch.cs" />
     <Compile Include="Runtime\BasePatch.cs" />
     <Compile Include="Runtime\EventArgs\PatchFailedEventArgs.cs" />

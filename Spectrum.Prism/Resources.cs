@@ -11,5 +11,8 @@
         public const string SpectrumUpdaterTypeName = "Spectrum.Bootstrap.Updater";
         public const string SpectrumInitMethodName = "StartManager";
         public const string SpectrumUpdateMethodName = "UpdateManager";
+
+        public const string DiscordControllerTypeName = "DiscordController";
+        public const string DiscordControllerStartMethodName = "Start";
     }
 }
