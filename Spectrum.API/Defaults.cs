@@ -12,10 +12,12 @@ namespace Spectrum.API
         public static string LogDirectory => Path.Combine(BasePath, "Logs");
         public static string SettingsDirectory => Path.Combine(BasePath, "Settings");
         public static string ResolverDirectory => Path.Combine(BasePath, "Dependencies");
+        public static string AssetDirectory => Path.Combine(BasePath, "Assets");
 
         public const string HotkeyManagerLogFileName = "HotkeyManager.log";
         public const string PluginLoaderLogFileName = "PluginLoader.log";
         public const string DependencyResolverLogFileName = "DependencyResolver.log";
         public const string FileSystemLogFileName = "FileSystem.log";
+        public const string RuntimeAssetLoaderLogFileName = "RuntimeAssetLoader.log";
     }
 }
