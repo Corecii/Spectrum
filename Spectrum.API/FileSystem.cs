@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using Spectrum.API.Logging;
 
 namespace Spectrum.API
 {
     public class FileSystem
     {
-        public string DirectoryName { get; }
-        public string DirectoryPath => Path.Combine(Defaults.PluginDataDirectory, DirectoryName);
+        public string RootDirectory { get; }
+        public string DirectoryPath => Path.Combine(RootDirectory, Defaults.PrivateDataDirectory);
 
         private static Logger Log { get; set; }
 
@@ -16,9 +17,9 @@ namespace Spectrum.API
             Log = new Logger(Defaults.FileSystemLogFileName);
         }
 
-        public FileSystem(Type type)
+        public FileSystem()
         {
-            DirectoryName = type.Assembly.GetName().Name;
+            RootDirectory = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
 
             if (!Directory.Exists(DirectoryPath))
             {

@@ -2,7 +2,7 @@
 
 namespace Spectrum.Manager.Managed
 {
-    class PluginContainer : List<PluginInfo>
+    class PluginContainer : List<PluginHost>
     {
         public bool SetPluginState(string name, bool enabled)
         {
@@ -15,11 +15,11 @@ namespace Spectrum.Manager.Managed
             return true;
         }
 
-        public PluginInfo GetPluginByName(string name)
+        public PluginHost GetPluginByName(string name)
         {
             foreach (var pluginInfo in this)
             {
-                if (pluginInfo.Name == name)
+                if (pluginInfo.Manifest.FriendlyName == name)
                     return pluginInfo;
             }
             return null;

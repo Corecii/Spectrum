@@ -6,6 +6,7 @@ namespace Spectrum.API
         MicroWave = 2,
         InfraRed = 3,
         UltraViolet = 4,
-        XRay = 5
+        XRay = 5,
+        Gamma = 6
     }
 }

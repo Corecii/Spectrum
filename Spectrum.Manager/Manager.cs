@@ -5,6 +5,7 @@ using Spectrum.API.Configuration;
 using Spectrum.API.Experimental;
 using Spectrum.API.Interfaces.Plugins;
 using Spectrum.API.Interfaces.Systems;
+using Spectrum.API.IPC;
 using Spectrum.API.Logging;
 using Spectrum.Interop.Game;
 using Spectrum.Manager.Input;
@@ -19,7 +20,7 @@ namespace Spectrum.Manager
         private ExternalDependencyResolver ManagedDependencyResolver { get; set; }
         private Logger Log;
 
-        public RuntimeAssetLoader Assets { get; set; }
+        public RuntimeAssetLoader Assets { get; private set; }
         public IHotkeyManager Hotkeys { get; set; }
 
         public bool IsEnabled { get; set; }
@@ -62,6 +63,16 @@ namespace Spectrum.Manager
             }
         }
 
+        public void RegisterIPC(string ipcIdentifier)
+        {
+
+        }
+
+        public void SendIPC(string ipcIdentifierTo, IPCData data)
+        {
+
+        }
+
         public void CheckPaths()
         {
             if(!Directory.Exists(Defaults.SettingsDirectory))
@@ -76,22 +87,10 @@ namespace Spectrum.Manager
                 Directory.CreateDirectory(Defaults.LogDirectory);
             }
 
-            if(!Directory.Exists(Defaults.PluginDataDirectory))
-            {
-                Log.Info("Plugin data directory does not exist. Creating...");
-                Directory.CreateDirectory(Defaults.PluginDataDirectory);
-            }
-
             if(!Directory.Exists(Defaults.PluginDirectory))
             {
                 Log.Info("Plugin directory does not exist. Creating...");
                 Directory.CreateDirectory(Defaults.PluginDirectory);
-            }
-
-            if(!Directory.Exists(Defaults.ResolverDirectory))
-            {
-                Log.Info("External dependency resolver directory does not exist. Creating...");
-                Directory.CreateDirectory(Defaults.ResolverDirectory);
             }
         }
 
@@ -108,7 +107,7 @@ namespace Spectrum.Manager
                 {
                     if(pluginInfo.Enabled && pluginInfo.UpdatesEveryFrame)
                     {
-                        var plugin = pluginInfo.Plugin as IUpdatable;
+                        var plugin = pluginInfo.Instance as IUpdatable;
                         plugin?.Update();
                     }
                 }
@@ -119,7 +118,7 @@ namespace Spectrum.Manager
         {
             try
             {
-                Global.Settings = new Settings(typeof(Manager));
+                Global.Settings = new Settings("ManagerSettings");
 
                 if(!Global.Settings.ContainsKey<Section>("Output"))
                 {
@@ -170,15 +169,19 @@ namespace Spectrum.Manager
         {
             Global.Settings.Clear();
 
-            Section sec = new Section();
-            sec["LogToConsole"] = true;
-            sec["ShowWatermark"] = true;
+            Section sec = new Section
+            {
+                ["LogToConsole"] = true,
+                ["ShowWatermark"] = true
+            };
             Global.Settings["Output"] = sec;
 
-            sec = new Section();
-            sec["FirstRun"] = false;
-            sec["LoadPlugins"] = true;
-            sec["Enabled"] = true;
+            sec = new Section
+            {
+                ["FirstRun"] = false,
+                ["LoadPlugins"] = true,
+                ["Enabled"] = true
+            };
             Global.Settings["Execution"] = sec;
 
             Global.Settings.Save();
@@ -199,19 +202,19 @@ namespace Spectrum.Manager
             {
                 try
                 {
-                    pluginInfo.Plugin.Initialize(this);
+                    pluginInfo.Instance.Initialize(this);
 
-                    if(pluginInfo.Plugin is IRequiresAssetLoad needsAsset)
+                    if(pluginInfo.Instance is IRequiresAssetLoad needsAsset)
                     {
-                        Log.Info($"Loading assets for plugin {pluginInfo.Name}");
+                        Log.Info($"Loading assets for plugin {pluginInfo.Manifest.FriendlyName}");
                         needsAsset.LoadAssets(Assets);
                     }
 
-                    Log.Info($"Plugin {pluginInfo.Name} initialized");
+                    Log.Info($"Plugin {pluginInfo.Manifest.FriendlyName} initialized");
                 }
                 catch(Exception ex)
                 {
-                    Log.Error($"Plugin {pluginInfo.Name} failed to initialize. Exception below.\n{ex}");
+                    Log.Error($"Plugin {pluginInfo.Manifest.FriendlyName} failed to initialize. Exception below.\n{ex}");
                 }
             }
 

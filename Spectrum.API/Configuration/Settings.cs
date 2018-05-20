@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using JsonFx.Serialization;
 
 namespace Spectrum.API.Configuration
@@ -7,18 +8,13 @@ namespace Spectrum.API.Configuration
     public class Settings : Section
     {
         private string FileName { get; }
-        private string FilePath => Path.Combine(Defaults.SettingsDirectory, FileName);
+        private string RootDirectory { get; }
+        private string FilePath => Path.Combine(Path.Combine(RootDirectory, Defaults.PrivateSettingsDirectory), FileName);
 
-        public Settings(Type type, string postfix = "")
+        public Settings(string fileName)
         {
-            if (string.IsNullOrEmpty(postfix))
-            {
-                FileName = $"{type.Assembly.GetName().Name}.json";
-            }
-            else
-            {
-                FileName = $"{type.Assembly.GetName().Name}.{postfix}.json";
-            }
+            RootDirectory = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
+            FileName = $"{fileName}.json";
 
             if (File.Exists(FilePath))
             {

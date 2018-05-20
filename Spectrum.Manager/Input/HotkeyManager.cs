@@ -26,7 +26,7 @@ namespace Spectrum.Manager.Input
 
         public void Bind(Hotkey hotkey, Action action)
         {
-            if (Exists(hotkey))
+            if(Exists(hotkey))
             {
                 WriteExistingHotkeyInfo(hotkey);
                 return;
@@ -45,31 +45,11 @@ namespace Spectrum.Manager.Input
             Bind(new Hotkey(hotkeyString, isOneTime), action);
         }
 
-        public void Bind(Hotkey hotkey, string scriptFileName)
-        {
-            if (Exists(hotkey))
-            {
-                WriteExistingHotkeyInfo(hotkey);
-                return;
-            }
-            Log.Info($"Bound '{hotkey}' to the on-demand script '{scriptFileName}'.");
-        }
-
-        public void Bind(string hotkeyString, string scriptFileName)
-        {
-            Bind(new Hotkey(hotkeyString), scriptFileName);
-        }
-
-        public void Bind(string hotkeyString, string scriptFileName, bool isOneTime)
-        {
-            Bind(new Hotkey(hotkeyString, isOneTime), scriptFileName);
-        }
-
         public void Unbind(string hotkeyString)
         {
-            foreach (var hotkey in ActionHotkeys)
+            foreach(var hotkey in ActionHotkeys)
             {
-                if (hotkey.ToString() == hotkeyString)
+                if(hotkey.ToString() == hotkeyString)
                 {
                     ActionHotkeys.Remove(hotkey.Key);
                 }
@@ -88,9 +68,9 @@ namespace Spectrum.Manager.Input
 
         public bool Exists(string hotkeyString)
         {
-            foreach (var hotkey in ActionHotkeys)
+            foreach(var hotkey in ActionHotkeys)
             {
-                if (hotkey.ToString() == hotkeyString)
+                if(hotkey.ToString() == hotkeyString)
                     return true;
             }
 
@@ -107,19 +87,19 @@ namespace Spectrum.Manager.Input
             List<Hotkey> pressed = new List<Hotkey>();
             int biggestPressed = 0;
 
-            if (ActionHotkeys.Count > 0)
+            if(ActionHotkeys.Count > 0)
             {
-                foreach (var hotkey in ActionHotkeys)
+                foreach(var hotkey in ActionHotkeys)
                 {
-                    if (hotkey.Key.IsPressed)
+                    if(hotkey.Key.IsPressed)
                     {
-                        if (hotkey.Key.Specificity > biggestPressed)
+                        if(hotkey.Key.Specificity > biggestPressed)
                         {
                             pressed.Clear();
                             biggestPressed = hotkey.Key.Specificity;
                         }
 
-                        if (hotkey.Key.Specificity == biggestPressed)
+                        if(hotkey.Key.Specificity == biggestPressed)
                         {
                             pressed.Add(hotkey.Key);
                         }
@@ -127,8 +107,9 @@ namespace Spectrum.Manager.Input
                 }
             }
 
-            if (biggestPressed > 0) {
-                foreach (var hotkey in pressed)
+            if(biggestPressed > 0)
+            {
+                foreach(var hotkey in pressed)
                 {
                     ActionHotkeys[hotkey].Invoke();
                 }
@@ -137,7 +118,7 @@ namespace Spectrum.Manager.Input
 
         private void WriteExistingHotkeyInfo(Hotkey hotkey)
         {
-            if (IsActionHotkey(hotkey))
+            if(IsActionHotkey(hotkey))
             {
                 Log.Error($"The hotkey '{hotkey}' is already bound to another action.");
             }

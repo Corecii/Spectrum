@@ -32,19 +32,25 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JsonFx, Version=2.0.1209.2802, Culture=neutral, PublicKeyToken=315052dd637f8a52, processorArchitecture=MSIL">
+      <HintPath>..\packages\JsonFx.2.0.1209.2802\lib\net35\JsonFx.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Global.cs" />
     <Compile Include="Input\HotkeyManager.cs" />
     <Compile Include="Managed\ExternalDependencyResolver.cs" />
+    <Compile Include="Managed\Metadata\PluginManifest.cs" />
     <Compile Include="Managed\PluginContainer.cs" />
-    <Compile Include="Managed\PluginInfo.cs" />
+    <Compile Include="Managed\PluginHost.cs" />
     <Compile Include="Managed\PluginLoader.cs" />
     <Compile Include="Manager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Spectrum.API\Spectrum.API.csproj">
       <Project>{a9cfd86d-1604-4c80-b02b-e60ad98ba86f}</Project>

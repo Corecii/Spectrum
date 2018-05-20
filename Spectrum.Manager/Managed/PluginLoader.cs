@@ -6,6 +6,8 @@ using Spectrum.API;
 using Spectrum.API.Interfaces.Plugins;
 using Spectrum.API.Logging;
 using Spectrum.API.Configuration;
+using Spectrum.API.Exceptions;
+using Spectrum.Manager.Managed.Metadata;
 
 namespace Spectrum.Manager.Managed
 {
@@ -15,8 +17,6 @@ namespace Spectrum.Manager.Managed
         private PluginContainer PluginContainer { get; }
 
         private Logger Log { get; }
-
-        private int _loadedPlugins;
 
         public PluginLoader(string pluginDirectory, PluginContainer pluginContainer)
         {
@@ -33,22 +33,88 @@ namespace Spectrum.Manager.Managed
         public void LoadPlugins()
         {
             Log.Info("Starting load procedure.");
-            var filePaths = Directory.GetFiles(PluginDirectory, "*.plugin.dll");
+            var pluginDirectories = Directory.GetDirectories(PluginDirectory);
 
-            foreach(var path in filePaths)
+            foreach(var path in pluginDirectories)
             {
-                var fileName = Path.GetFileName(path);
+                var manifestPath = Path.Combine(path, "plugin.json");
+                Console.WriteLine(manifestPath);
 
-                Assembly asm;
+                if(!File.Exists(manifestPath))
+                {
+                    Log.Error($"No plugin manifest in {path}. Skipping.");
+                    continue;
+                }
+
+                PluginManifest manifest;
                 try
                 {
-                    Log.Info($"Now loading library file: '{fileName}'");
-                    asm = Assembly.LoadFrom(path);
+                    manifest = PluginManifest.FromFile(manifestPath);
+                }
+                catch(MetadataReadException mre)
+                {
+                    Log.Error($"Error reading manifest:  {mre.Message}");
+                    continue;
+                }
+
+                if(manifest == null)
+                {
+                    Console.WriteLine("Dicks");
+                }
+
+                if(PluginContainer.GetPluginByName(manifest.FriendlyName) != null)
+                {
+                    Log.Error($"Plugin conflict detected. A plugin with name {manifest.FriendlyName} already exists.");
+                    continue;
+                }
+
+                Log.Info($"Trying to load the plugin according to the following manifest:\n{manifest}");
+
+                var targetModulePath = Path.Combine(path, manifest.ModuleFileName);
+                if(!File.Exists(targetModulePath))
+                {
+                    Log.Error("The manifest-declared module file does not exist.");
+                    continue;
+                }
+
+                bool depsLoaded = true;
+                foreach(var depFileName in manifest.Dependencies)
+                {
+                    var depPath = Path.Combine(Path.Combine(path, Defaults.PrivateDependencyDirectory), depFileName);
+                    if(!File.Exists(depPath))
+                    {
+                        Log.Error($"Couldn't load declared private dependency assembly {depFileName} for plugin {manifest.ModuleFileName}. Verify it exists and try again.");
+
+                        depsLoaded = false;
+                        break;
+                    }
+
+                    try
+                    {
+                        Assembly.LoadFrom(depPath);
+                    }
+                    catch(Exception ex)
+                    {
+                        Log.Error($"Couldn't load declared private dependency assembly {depFileName} for plugin {manifest.ModuleFileName}. Is the assembly corrupted?");
+                        Log.ExceptionSilent(ex);
+
+                        depsLoaded = false;
+                        break;
+                    }
+                }
+
+                if(!depsLoaded)
+                    continue;
+
+                Assembly assembly;
+                try
+                {
+                    assembly = Assembly.LoadFrom(targetModulePath);
                 }
                 catch(Exception e)
                 {
-                    Console.WriteLine($"Exception occured while loading library file: '{fileName}'. Check the log for details.");
-                    Log.Exception(e);
+                    Log.Error("Couldn't load target module assembly.");
+                    Log.ExceptionSilent(e);
 
                     continue;
                 }
@@ -56,109 +122,83 @@ namespace Spectrum.Manager.Managed
                 Type[] exportedTypes;
                 try
                 {
-                    exportedTypes = asm.GetExportedTypes();
+                    exportedTypes = assembly.GetExportedTypes();
                 }
-                catch(ReflectionTypeLoadException rtlex)
+                catch(ReflectionTypeLoadException rtle)
                 {
-                    Console.WriteLine($"Couldn't load the plugin '{fileName}'. Was it built for an earlier Spectrum version?");
-                    Log.ExceptionSilent(rtlex);
+                    Log.Error($"Couldn't import types of assembly {manifest.ModuleFileName}. Possible outdated dependencies?");
+                    Log.ExceptionSilent(rtle);
 
                     continue;
                 }
                 catch(Exception e)
                 {
-                    Console.WriteLine($"Exception occured while validating library file: '{fileName}'. Check the log for details.");
-                    Log.Exception(e);
+                    Log.Error($"An exception occured while importing types from assembly {manifest.ModuleFileName}.");
+                    Log.ExceptionSilent(e);
 
                     continue;
                 }
 
-                if(exportedTypes.FirstOrDefault(x => x.Name == "Entry") == null)
+                Type entryClassType = exportedTypes.FirstOrDefault(x => x.Name == manifest.EntryClassName);
+                if(entryClassType == null)
                 {
-                    Console.WriteLine($"No entry point detected. Skipping the file ${fileName}");
+                    Log.Error($"The assembly {manifest.ModuleFileName} does not define an entry point class {manifest.EntryClassName}.");
                     continue;
                 }
 
-                foreach(var exportedType in exportedTypes)
+
+                if(!typeof(IPlugin).IsAssignableFrom(entryClassType))
                 {
-                    // All plugins MUST have a type named Entry.
-                    if(exportedType.Name == "Entry")
-                    {
-                        Log.Info("Plugin contains a valid entry point. Proceeding...");
-                        try
-                        {
-                            Log.Info("Trying to validate the plugin...");
-                            // All plugins MUST implement IPlugin interface.
-                            if(typeof(IPlugin).IsAssignableFrom(exportedType))
-                            {
-                                IPlugin plugin;
-
-                                try
-                                {
-                                    plugin = (IPlugin)Activator.CreateInstance(exportedType);
-                                }
-                                catch(TypeLoadException tlex)
-                                {
-                                    Log.Error($"Couldn't load the plugin '{fileName}'. Was it built for an earlier Spectrum version?");
-                                    Log.ExceptionSilent(tlex);
-                                    break;
-                                }
-                                catch(Exception ex)
-                                {
-                                    Log.Error($"An unexpected exception occured while loading '{fileName}'. The plugin wasn't loaded. Check the log for details.");
-                                    Log.Exception(ex);
-                                    break;
-                                }
-
-                                var pluginInfo = new PluginInfo
-                                {
-                                    Name = plugin.FriendlyName,
-                                    Enabled = true,
-                                    Plugin = plugin,
-                                    UpdatesEveryFrame = false
-                                };
-
-                                if(pluginInfo.Plugin.CompatibleAPILevel != SystemVersion.APILevel)
-                                {
-                                    Log.Info("The plugin is not built for the current API level. It may have an unexpected behavior.");
-                                }
-
-                                // Plugin MAY also implement IUpdatable interface.
-                                if(typeof(IUpdatable).IsAssignableFrom(exportedType))
-                                {
-                                    Log.Info("The plugin is going to be updated every frame.");
-                                    pluginInfo.UpdatesEveryFrame = true;
-                                }
-
-                                if(PluginContainer.GetPluginByName(pluginInfo.Name) == null)
-                                {
-                                    PluginContainer.Add(pluginInfo);
-
-                                    Log.Info("Succesfully loaded a new plugin:\n" +
-                                             $"   Name: {pluginInfo.Name}\n" +
-                                             $"   Author: {pluginInfo.Plugin.Author}\n" +
-                                             $"   APILevel: {pluginInfo.Plugin.CompatibleAPILevel}\n" +
-                                             $"   Contact: {pluginInfo.Plugin.Contact}\n" +
-                                             $"   Updates every frame: {pluginInfo.UpdatesEveryFrame}");
-
-                                    _loadedPlugins++;
-                                }
-                                else
-                                {
-                                    Log.Error($"Did NOT load the plugin: '{fileName}'. A plugin with this name has already been loaded once.");
-                                }
-                                continue;
-                            }
-                            Log.Error($"'{fileName}' is not a valid plugin. Does not implement common IPlugin interface.");
-                        }
-                        catch(Exception e)
-                        {
-                            Log.Exception(e);
-                        }
-                    }
+                    Log.Error($"The exported entry class {manifest.EntryClassName} does not implement IPlugin interface.");
+                    continue;
                 }
+
+                IPlugin instance;
+                try
+                {
+                    instance = (IPlugin)Activator.CreateInstance(entryClassType);
+                }
+                catch(TypeLoadException tle)
+                {
+                    Log.Error($"Couldn't create an instance from exported entry class type {manifest.EntryClassName} of assembly {manifest.ModuleFileName}.");
+                    Log.ExceptionSilent(tle);
+
+                    continue;
+                }
+                catch(Exception ex)
+                {
+                    Log.Error("An unexpected exception occured. The plugin has not been activated. Check the exception log file for details.");
+                    Log.ExceptionSilent(ex);
+
+                    continue;
+                }
+
+                var pluginHost = new PluginHost()
+                {
+                    Manifest = manifest,
+                    RootDirectory = path,
+                    Enabled = true,
+                    Instance = instance
+                };
+
+                if(manifest.CompatibleAPILevel != SystemVersion.APILevel)
+                    Log.Warning($"Plugin assembly {manifest.ModuleFileName} was compiled for an earlier Spectrum version. Expect unexpected.");
+
+                if(typeof(IUpdatable).IsAssignableFrom(entryClassType))
+                {
+                    Log.Info($"Plugin exports IUpdatable interface. This means it will run Update() every frame.");
+                    pluginHost.UpdatesEveryFrame = true;
+                }
+
+                if(typeof(IIPCEnabled).IsAssignableFrom(entryClassType))
+                {
+                    Log.Info($"Plugin exports IIPCEnabled interface. This means it can respond and/or communicate with other plugins.");
+                    pluginHost.IsIPCEnabled = true;
+                }
+
+                PluginContainer.Add(pluginHost);
+                Log.Info($"Plugin assembly {manifest.ModuleFileName} has been loaded.");
             }
-            Log.Info($"Load complete. Loaded {_loadedPlugins} plugin(s).");
         }
     }
 }
