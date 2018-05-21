@@ -55,13 +55,12 @@
     <Compile Include="Defaults.cs" />
     <Compile Include="Exceptions\MetadataReadException.cs" />
     <Compile Include="Exceptions\SettingsException.cs" />
-    <Compile Include="Experimental\RuntimeAssetLoader.cs" />
-    <Compile Include="FileSystem.cs" />
+    <Compile Include="Storage\Assets.cs" />
+    <Compile Include="Storage\FileSystem.cs" />
     <Compile Include="Input\Hotkey.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Interfaces\Plugins\IIPCEnabled.cs" />
     <Compile Include="Interfaces\Plugins\IPlugin.cs" />
-    <Compile Include="Interfaces\Plugins\IRequiresAssetLoad.cs" />
     <Compile Include="Interfaces\Plugins\IUpdatable.cs" />
     <Compile Include="Interfaces\Systems\IHotkeyManager.cs" />
     <Compile Include="Interfaces\Systems\IManager.cs" />
@@ -74,7 +73,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="IPC\EventArgs\" />
+    <Folder Include="Experimental\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

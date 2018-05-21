@@ -13,9 +13,9 @@ namespace Spectrum.API
         public static string PrivateSettingsDirectory => "Settings";
         public static string PrivateAssetsDirectory => "Assets";
 
-        public static string PluginDirectory => Path.Combine(BasePath, "Plugins");
-        public static string LogDirectory => Path.Combine(BasePath, "Logs");
-        public static string SettingsDirectory => Path.Combine(BasePath, "Settings");
+        public static string ManagerPluginDirectory => Path.Combine(BasePath, "Plugins");
+        public static string ManagerLogDirectory => Path.Combine(BasePath, "Logs");
+        public static string ManagerSettingsDirectory => Path.Combine(BasePath, "Settings");
 
         public const string HotkeyManagerLogFileName = "HotkeyManager.log";
         public const string PluginLoaderLogFileName = "PluginLoader.log";

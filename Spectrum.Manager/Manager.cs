@@ -9,7 +9,7 @@ using Spectrum.API.IPC;
 using Spectrum.API.Logging;
 using Spectrum.Interop.Game;
 using Spectrum.Manager.Input;
-using Spectrum.Manager.Managed;
+using Spectrum.Manager.Runtime;
 
 namespace Spectrum.Manager
 {
@@ -17,14 +17,12 @@ namespace Spectrum.Manager
     {
         private PluginContainer ManagedPluginContainer { get; set; }
         private PluginLoader ManagedPluginLoader { get; set; }
-        private ExternalDependencyResolver ManagedDependencyResolver { get; set; }
         private Logger Log;
 
-        public RuntimeAssetLoader Assets { get; private set; }
         public IHotkeyManager Hotkeys { get; set; }
 
         public bool IsEnabled { get; set; }
-        public bool CanLoadPlugins => Directory.Exists(Defaults.PluginDirectory);
+        public bool CanLoadPlugins => Directory.Exists(Defaults.ManagerPluginDirectory);
 
         public Manager()
         {
@@ -42,8 +40,7 @@ namespace Spectrum.Manager
                 IsEnabled = false;
                 return;
             }
-            ManagedDependencyResolver = new ExternalDependencyResolver();
-            Assets = new RuntimeAssetLoader();
+
             Hotkeys = new HotkeyManager();
 
             Scene.Loaded += (sender, args) =>
@@ -75,22 +72,22 @@ namespace Spectrum.Manager
 
         public void CheckPaths()
         {
-            if(!Directory.Exists(Defaults.SettingsDirectory))
+            if(!Directory.Exists(Defaults.ManagerSettingsDirectory))
             {
                 Log.Info("Settings directory does not exist. Creating...");
-                Directory.CreateDirectory(Defaults.SettingsDirectory);
+                Directory.CreateDirectory(Defaults.ManagerSettingsDirectory);
             }
 
-            if(!Directory.Exists(Defaults.LogDirectory))
+            if(!Directory.Exists(Defaults.ManagerLogDirectory))
             {
                 Log.Info("Log directory does not exist. Creating...");
-                Directory.CreateDirectory(Defaults.LogDirectory);
+                Directory.CreateDirectory(Defaults.ManagerLogDirectory);
             }
 
-            if(!Directory.Exists(Defaults.PluginDirectory))
+            if(!Directory.Exists(Defaults.ManagerPluginDirectory))
             {
                 Log.Info("Plugin directory does not exist. Creating...");
-                Directory.CreateDirectory(Defaults.PluginDirectory);
+                Directory.CreateDirectory(Defaults.ManagerPluginDirectory);
             }
         }
 
@@ -190,7 +187,7 @@ namespace Spectrum.Manager
         private void LoadExtensions()
         {
             ManagedPluginContainer = new PluginContainer();
-            ManagedPluginLoader = new PluginLoader(Defaults.PluginDirectory, ManagedPluginContainer);
+            ManagedPluginLoader = new PluginLoader(Defaults.ManagerPluginDirectory, ManagedPluginContainer);
             ManagedPluginLoader.LoadPlugins();
         }
 
@@ -203,13 +200,6 @@ namespace Spectrum.Manager
                 try
                 {
                     pluginInfo.Instance.Initialize(this);
-
-                    if(pluginInfo.Instance is IRequiresAssetLoad needsAsset)
-                    {
-                        Log.Info($"Loading assets for plugin {pluginInfo.Manifest.FriendlyName}");
-                        needsAsset.LoadAssets(Assets);
-                    }
-
                     Log.Info($"Plugin {pluginInfo.Manifest.FriendlyName} initialized");
                 }
                 catch(Exception ex)

@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace Spectrum.Manager.Managed.Metadata
+namespace Spectrum.Manager.Runtime.Metadata
 {
     public class PluginManifest
     {

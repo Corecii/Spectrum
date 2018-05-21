@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using Spectrum.API.Logging;
 
-namespace Spectrum.API
+namespace Spectrum.API.Storage
 {
     public class FileSystem
     {

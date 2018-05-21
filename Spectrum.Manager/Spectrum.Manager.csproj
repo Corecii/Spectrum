@@ -40,11 +40,10 @@
   <ItemGroup>
     <Compile Include="Global.cs" />
     <Compile Include="Input\HotkeyManager.cs" />
-    <Compile Include="Managed\ExternalDependencyResolver.cs" />
-    <Compile Include="Managed\Metadata\PluginManifest.cs" />
-    <Compile Include="Managed\PluginContainer.cs" />
-    <Compile Include="Managed\PluginHost.cs" />
-    <Compile Include="Managed\PluginLoader.cs" />
+    <Compile Include="Runtime\Metadata\PluginManifest.cs" />
+    <Compile Include="Runtime\PluginContainer.cs" />
+    <Compile Include="Runtime\PluginHost.cs" />
+    <Compile Include="Runtime\PluginLoader.cs" />
     <Compile Include="Manager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

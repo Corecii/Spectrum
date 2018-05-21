@@ -1,7 +1,7 @@
 using Spectrum.API.Interfaces.Plugins;
-using Spectrum.Manager.Managed.Metadata;
+using Spectrum.Manager.Runtime.Metadata;
 
-namespace Spectrum.Manager.Managed
+namespace Spectrum.Manager.Runtime
 {
     class PluginHost
     {

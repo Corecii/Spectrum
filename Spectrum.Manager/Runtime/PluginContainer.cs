@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Spectrum.Manager.Managed
+namespace Spectrum.Manager.Runtime
 {
     class PluginContainer : List<PluginHost>
     {

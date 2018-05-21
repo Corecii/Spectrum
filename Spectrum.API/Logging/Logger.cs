@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace Spectrum.API.Logging
 {
@@ -13,12 +14,18 @@ namespace Spectrum.API.Logging
         public bool WriteToConsole { get; set; }
         public bool ColorizeLines { get; set; }
 
-        private string FilePath { get; }
+        private string RootDirectory { get; }
+        private string FileName { get; }
+
+        private string FilePath => Path.Combine(Path.Combine(RootDirectory, Defaults.PrivateLogDirectory), FileName);
 
         public Logger(string fileName)
         {
+
             ColorizeLines = true;
-            FilePath = Path.Combine(Defaults.LogDirectory, fileName);
+
+            RootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            FileName = fileName;
 
             Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
 

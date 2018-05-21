@@ -24,6 +24,13 @@ namespace Spectrum.API.IPC
             }
         }
 
+        public string SourceIdentifier { get; }
+
+        public IPCData(string sourceIdentifier)
+        {
+            SourceIdentifier = sourceIdentifier;
+        }
+
         public T Get<T>(string key)
         {
             try

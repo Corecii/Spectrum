@@ -7,9 +7,9 @@ using Spectrum.API.Interfaces.Plugins;
 using Spectrum.API.Logging;
 using Spectrum.API.Configuration;
 using Spectrum.API.Exceptions;
-using Spectrum.Manager.Managed.Metadata;
+using Spectrum.Manager.Runtime.Metadata;
 
-namespace Spectrum.Manager.Managed
+namespace Spectrum.Manager.Runtime
 {
     class PluginLoader
     {
@@ -35,12 +35,12 @@ namespace Spectrum.Manager.Managed
             Log.Info("Starting load procedure.");
             var pluginDirectories = Directory.GetDirectories(PluginDirectory);
 
-            foreach(var path in pluginDirectories)
+            foreach (var path in pluginDirectories)
             {
                 var manifestPath = Path.Combine(path, "plugin.json");
                 Console.WriteLine(manifestPath);
 
-                if(!File.Exists(manifestPath))
+                if (!File.Exists(manifestPath))
                 {
                     Log.Error($"No plugin manifest in {path}. Skipping.");
                     continue;
@@ -51,18 +51,18 @@ namespace Spectrum.Manager.Managed
                 {
                     manifest = PluginManifest.FromFile(manifestPath);
                 }
-                catch(MetadataReadException mre)
+                catch (MetadataReadException mre)
                 {
                     Log.Error($"Error reading manifest:  {mre.Message}");
                     continue;
                 }
 
-                if(manifest == null)
+                if (manifest == null)
                 {
                     Console.WriteLine("Dicks");
                 }
 
-                if(PluginContainer.GetPluginByName(manifest.FriendlyName) != null)
+                if (PluginContainer.GetPluginByName(manifest.FriendlyName) != null)
                 {
                     Log.Error($"Plugin conflict detected. A plugin with name {manifest.FriendlyName} already exists.");
                     continue;
@@ -71,17 +71,17 @@ namespace Spectrum.Manager.Managed
                 Log.Info($"Trying to load the plugin according to the following manifest:\n{manifest}");
 
                 var targetModulePath = Path.Combine(path, manifest.ModuleFileName);
-                if(!File.Exists(targetModulePath))
+                if (!File.Exists(targetModulePath))
                 {
                     Log.Error("The manifest-declared module file does not exist.");
                     continue;
                 }
 
                 bool depsLoaded = true;
-                foreach(var depFileName in manifest.Dependencies)
+                foreach (var depFileName in manifest.Dependencies)
                 {
                     var depPath = Path.Combine(Path.Combine(path, Defaults.PrivateDependencyDirectory), depFileName);
-                    if(!File.Exists(depPath))
+                    if (!File.Exists(depPath))
                     {
                         Log.Error($"Couldn't load declared private dependency assembly {depFileName} for plugin {manifest.ModuleFileName}. Verify it exists and try again.");
 
@@ -93,7 +93,7 @@ namespace Spectrum.Manager.Managed
                     {
                         Assembly.LoadFrom(depPath);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Log.Error($"Couldn't load declared private dependency assembly {depFileName} for plugin {manifest.ModuleFileName}. Is the assembly corrupted?");
                         Log.ExceptionSilent(ex);
@@ -103,7 +103,7 @@ namespace Spectrum.Manager.Managed
                     }
                 }
 
-                if(!depsLoaded)
+                if (!depsLoaded)
                     continue;
 
                 Assembly assembly;
@@ -111,7 +111,7 @@ namespace Spectrum.Manager.Managed
                 {
                     assembly = Assembly.LoadFrom(targetModulePath);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Log.Error("Couldn't load target module assembly.");
                     Log.ExceptionSilent(e);
@@ -124,14 +124,14 @@ namespace Spectrum.Manager.Managed
                 {
                     exportedTypes = assembly.GetExportedTypes();
                 }
-                catch(ReflectionTypeLoadException rtle)
+                catch (ReflectionTypeLoadException rtle)
                 {
                     Log.Error($"Couldn't import types of assembly {manifest.ModuleFileName}. Possible outdated dependencies?");
                     Log.ExceptionSilent(rtle);
 
                     continue;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Log.Error($"An exception occured while importing types from assembly {manifest.ModuleFileName}.");
                     Log.ExceptionSilent(e);
@@ -140,14 +140,14 @@ namespace Spectrum.Manager.Managed
                 }
 
                 Type entryClassType = exportedTypes.FirstOrDefault(x => x.Name == manifest.EntryClassName);
-                if(entryClassType == null)
+                if (entryClassType == null)
                 {
                     Log.Error($"The assembly {manifest.ModuleFileName} does not define an entry point class {manifest.EntryClassName}.");
                     continue;
                 }
 
 
-                if(!typeof(IPlugin).IsAssignableFrom(entryClassType))
+                if (!typeof(IPlugin).IsAssignableFrom(entryClassType))
                 {
                     Log.Error($"The exported entry class {manifest.EntryClassName} does not implement IPlugin interface.");
                     continue;
@@ -158,14 +158,14 @@ namespace Spectrum.Manager.Managed
                 {
                     instance = (IPlugin)Activator.CreateInstance(entryClassType);
                 }
-                catch(TypeLoadException tle)
+                catch (TypeLoadException tle)
                 {
                     Log.Error($"Couldn't create an instance from exported entry class type {manifest.EntryClassName} of assembly {manifest.ModuleFileName}.");
                     Log.ExceptionSilent(tle);
 
                     continue;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Log.Error("An unexpected exception occured. The plugin has not been activated. Check the exception log file for details.");
                     Log.ExceptionSilent(ex);
@@ -181,16 +181,16 @@ namespace Spectrum.Manager.Managed
                     Instance = instance
                 };
 
-                if(manifest.CompatibleAPILevel != SystemVersion.APILevel)
+                if (manifest.CompatibleAPILevel != SystemVersion.APILevel)
                     Log.Warning($"Plugin assembly {manifest.ModuleFileName} was compiled for an earlier Spectrum version. Expect unexpected.");
 
-                if(typeof(IUpdatable).IsAssignableFrom(entryClassType))
+                if (typeof(IUpdatable).IsAssignableFrom(entryClassType))
                 {
                     Log.Info($"Plugin exports IUpdatable interface. This means it will run Update() every frame.");
                     pluginHost.UpdatesEveryFrame = true;
                 }
 
-                if(typeof(IIPCEnabled).IsAssignableFrom(entryClassType))
+                if (typeof(IIPCEnabled).IsAssignableFrom(entryClassType))
                 {
                     Log.Info($"Plugin exports IIPCEnabled interface. This means it can respond and/or communicate with other plugins.");
                     pluginHost.IsIPCEnabled = true;
