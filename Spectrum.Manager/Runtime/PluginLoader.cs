@@ -157,6 +157,7 @@ namespace Spectrum.Manager.Runtime
                 try
                 {
                     instance = (IPlugin)Activator.CreateInstance(entryClassType);
+                    instance.IPCIdentifier = manifest.IPCIdentifier;
                 }
                 catch (TypeLoadException tle)
                 {

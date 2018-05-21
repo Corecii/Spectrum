@@ -73,6 +73,11 @@ namespace Spectrum.Manager
             }
         }
 
+        public bool IsIPCAvailable(string ipcIdentifier)
+        {
+            return PluginRegistry.GetByIPCIdentifier(ipcIdentifier) != null;
+        }
+
         public void CheckPaths()
         {
             if (!Directory.Exists(Defaults.ManagerSettingsDirectory))

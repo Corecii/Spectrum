@@ -1,5 +1,4 @@
-﻿using Spectrum.API.Experimental;
-using Spectrum.API.IPC;
+﻿using Spectrum.API.IPC;
 
 namespace Spectrum.API.Interfaces.Systems
 {
@@ -7,6 +6,7 @@ namespace Spectrum.API.Interfaces.Systems
     {
         IHotkeyManager Hotkeys { get; }
 
-        void SendIPC(string pluginRecipient, IPCData data);
+        void SendIPC(string ipcIdentifier, IPCData data);
+        bool IsIPCAvailable(string ipcIdentifier);
     }
 }
