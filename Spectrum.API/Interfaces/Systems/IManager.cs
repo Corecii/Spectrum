@@ -7,7 +7,6 @@ namespace Spectrum.API.Interfaces.Systems
     {
         IHotkeyManager Hotkeys { get; }
 
-        void RegisterIPC(string pluginIdentifier);
         void SendIPC(string pluginRecipient, IPCData data);
     }
 }

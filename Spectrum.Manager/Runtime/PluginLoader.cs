@@ -14,14 +14,14 @@ namespace Spectrum.Manager.Runtime
     class PluginLoader
     {
         private string PluginDirectory { get; }
-        private PluginContainer PluginContainer { get; }
+        private PluginRegistry PluginRegistry { get; }
 
         private Logger Log { get; }
 
-        public PluginLoader(string pluginDirectory, PluginContainer pluginContainer)
+        public PluginLoader(string pluginDirectory, PluginRegistry pluginRegistry)
         {
             PluginDirectory = pluginDirectory;
-            PluginContainer = pluginContainer;
+            PluginRegistry = pluginRegistry;
 
             Log = new Logger(Defaults.PluginLoaderLogFileName)
             {
@@ -62,7 +62,7 @@ namespace Spectrum.Manager.Runtime
                     Console.WriteLine("Dicks");
                 }
 
-                if (PluginContainer.GetPluginByName(manifest.FriendlyName) != null)
+                if (PluginRegistry.GetByName(manifest.FriendlyName) != null)
                 {
                     Log.Error($"Plugin conflict detected. A plugin with name {manifest.FriendlyName} already exists.");
                     continue;
@@ -182,7 +182,7 @@ namespace Spectrum.Manager.Runtime
                 };
 
                 if (manifest.CompatibleAPILevel != SystemVersion.APILevel)
-                    Log.Warning($"Plugin assembly {manifest.ModuleFileName} was compiled for an earlier Spectrum version. Expect unexpected.");
+                    Log.Warning($"Plugin assembly {manifest.ModuleFileName} declares that it was compiled for an earlier Spectrum version. Expect unexpected.");
 
                 if (typeof(IUpdatable).IsAssignableFrom(entryClassType))
                 {
@@ -196,7 +196,7 @@ namespace Spectrum.Manager.Runtime
                     pluginHost.IsIPCEnabled = true;
                 }
 
-                PluginContainer.Add(pluginHost);
+                PluginRegistry.Add(pluginHost);
                 Log.Info($"Plugin assembly {manifest.ModuleFileName} has been loaded.");
             }
         }

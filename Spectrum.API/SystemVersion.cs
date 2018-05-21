@@ -2,7 +2,7 @@ namespace Spectrum.API
 {
     public class SystemVersion
     {
-        public static readonly APILevel APILevel = APILevel.XRay;
+        public static readonly APILevel APILevel = APILevel.Gamma;
 
         public static int DistanceBuild
         {

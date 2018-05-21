@@ -15,7 +15,7 @@ namespace Spectrum.API.Experimental
         private string FilePath => Path.Combine(Path.Combine(RootDirectory, Defaults.PrivateAssetsDirectory), FileName);
 
         private static Logging.Logger Log { get; }
-        
+
         static Assets()
         {
             Log = new Logging.Logger(Defaults.RuntimeAssetLoaderLogFileName);
@@ -26,7 +26,7 @@ namespace Spectrum.API.Experimental
             RootDirectory = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
             FileName = fileName;
 
-            if(!File.Exists(FilePath))
+            if (!File.Exists(FilePath))
             {
                 Log.Error($"Couldn't find requested asset bundle at {FilePath}");
                 return;

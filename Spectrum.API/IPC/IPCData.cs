@@ -9,7 +9,7 @@ namespace Spectrum.API.IPC
         {
             get
             {
-                if(ContainsKey(key))
+                if (ContainsKey(key))
                     return base[key];
 
                 return null;
@@ -17,7 +17,7 @@ namespace Spectrum.API.IPC
 
             set
             {
-                if(!ContainsKey(key))
+                if (!ContainsKey(key))
                     Add(key, value);
                 else
                     base[key] = value;

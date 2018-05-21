@@ -41,7 +41,7 @@
     <Compile Include="Global.cs" />
     <Compile Include="Input\HotkeyManager.cs" />
     <Compile Include="Runtime\Metadata\PluginManifest.cs" />
-    <Compile Include="Runtime\PluginContainer.cs" />
+    <Compile Include="Runtime\PluginRegistry.cs" />
     <Compile Include="Runtime\PluginHost.cs" />
     <Compile Include="Runtime\PluginLoader.cs" />
     <Compile Include="Manager.cs" />

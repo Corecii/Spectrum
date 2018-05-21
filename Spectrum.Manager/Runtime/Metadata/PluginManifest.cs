@@ -24,6 +24,9 @@ namespace Spectrum.Manager.Runtime.Metadata
         [JsonName(Name = "EntryClassName")]
         public string EntryClassName;
 
+        [JsonName(Name = "IPCIdentifier")]
+        public string IPCIdentifier;
+
         [JsonName(Name = "CompatibleAPILevel")]
         public APILevel CompatibleAPILevel;
 
@@ -48,7 +51,6 @@ namespace Spectrum.Manager.Runtime.Metadata
 
             try
             {
-                Console.WriteLine(json);
                 return new JsonReader().Read<PluginManifest>(json);
             }
             catch(Exception ex)

@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Spectrum.API;
 using Spectrum.API.Configuration;
-using Spectrum.API.Experimental;
 using Spectrum.API.Interfaces.Plugins;
 using Spectrum.API.Interfaces.Systems;
 using Spectrum.API.IPC;
@@ -15,8 +14,8 @@ namespace Spectrum.Manager
 {
     public class Manager : IManager
     {
-        private PluginContainer ManagedPluginContainer { get; set; }
-        private PluginLoader ManagedPluginLoader { get; set; }
+        private PluginRegistry PluginRegistry { get; set; }
+        private PluginLoader PluginLoader { get; set; }
         private Logger Log;
 
         public IHotkeyManager Hotkeys { get; set; }
@@ -34,7 +33,7 @@ namespace Spectrum.Manager
             CheckPaths();
             InitializeSettings();
 
-            if(!Global.Settings.GetItem<Section>("Execution").GetItem<bool>("Enabled"))
+            if (!Global.Settings.GetItem<Section>("Execution").GetItem<bool>("Enabled"))
             {
                 Log.Error("Manager: Spectrum is disabled. Set 'Enabled' entry to 'true' in settings to restore extension framework functionality.");
                 IsEnabled = false;
@@ -42,49 +41,53 @@ namespace Spectrum.Manager
             }
 
             Hotkeys = new HotkeyManager();
-
             Scene.Loaded += (sender, args) =>
             {
                 Game.ShowWatermark = Global.Settings.GetItem<Section>("Output").GetItem<bool>("ShowWatermark");
 
-                if(Game.ShowWatermark)
+                if (Game.ShowWatermark)
                 {
                     Game.WatermarkText = SystemVersion.VersionString;
                 }
             };
 
-            if(Global.Settings.GetItem<Section>("Execution").GetItem<bool>("LoadPlugins"))
+            if (Global.Settings.GetItem<Section>("Execution").GetItem<bool>("LoadPlugins"))
             {
                 LoadExtensions();
                 StartExtensions();
             }
         }
 
-        public void RegisterIPC(string ipcIdentifier)
-        {
-
-        }
-
         public void SendIPC(string ipcIdentifierTo, IPCData data)
         {
+            var pluginHost = PluginRegistry.GetByIPCIdentifier(ipcIdentifierTo);
+            if (pluginHost != null)
+            {
+                if (!pluginHost.IsIPCEnabled)
+                {
+                    Log.Error($"Plugin with IPC ID {data.SourceIdentifier} tried to send IPCData to {ipcIdentifierTo}, but target is not IPC enabled.");
+                    return;
+                }
 
+                (pluginHost.Instance as IIPCEnabled).HandleIPCData(data);
+            }
         }
 
         public void CheckPaths()
         {
-            if(!Directory.Exists(Defaults.ManagerSettingsDirectory))
+            if (!Directory.Exists(Defaults.ManagerSettingsDirectory))
             {
                 Log.Info("Settings directory does not exist. Creating...");
                 Directory.CreateDirectory(Defaults.ManagerSettingsDirectory);
             }
 
-            if(!Directory.Exists(Defaults.ManagerLogDirectory))
+            if (!Directory.Exists(Defaults.ManagerLogDirectory))
             {
                 Log.Info("Log directory does not exist. Creating...");
                 Directory.CreateDirectory(Defaults.ManagerLogDirectory);
             }
 
-            if(!Directory.Exists(Defaults.ManagerPluginDirectory))
+            if (!Directory.Exists(Defaults.ManagerPluginDirectory))
             {
                 Log.Info("Plugin directory does not exist. Creating...");
                 Directory.CreateDirectory(Defaults.ManagerPluginDirectory);
@@ -93,16 +96,16 @@ namespace Spectrum.Manager
 
         public void UpdateExtensions()
         {
-            if(!IsEnabled)
+            if (!IsEnabled)
                 return;
 
             ((HotkeyManager)Hotkeys).Update();
 
-            if(ManagedPluginContainer != null)
+            if (PluginRegistry != null)
             {
-                foreach(var pluginInfo in ManagedPluginContainer)
+                foreach (var pluginInfo in PluginRegistry)
                 {
-                    if(pluginInfo.Enabled && pluginInfo.UpdatesEveryFrame)
+                    if (pluginInfo.Enabled && pluginInfo.UpdatesEveryFrame)
                     {
                         var plugin = pluginInfo.Instance as IUpdatable;
                         plugin?.Update();
@@ -117,46 +120,46 @@ namespace Spectrum.Manager
             {
                 Global.Settings = new Settings("ManagerSettings");
 
-                if(!Global.Settings.ContainsKey<Section>("Output"))
+                if (!Global.Settings.ContainsKey<Section>("Output"))
                 {
                     RecreateSettings();
                 }
                 else
                 {
-                    if(!Global.Settings.GetItem<Section>("Output").ContainsKey("LogToConsole"))
+                    if (!Global.Settings.GetItem<Section>("Output").ContainsKey("LogToConsole"))
                     {
                         Global.Settings.GetItem<Section>("Output")["LogToConsole"] = true;
                     }
 
-                    if(!Global.Settings.GetItem<Section>("Output").ContainsKey("ShowWatermark"))
+                    if (!Global.Settings.GetItem<Section>("Output").ContainsKey("ShowWatermark"))
                     {
                         Global.Settings.GetItem<Section>("Output")["ShowWatermark"] = true;
                     }
                 }
 
-                if(!Global.Settings.ContainsKey<Section>("Execution"))
+                if (!Global.Settings.ContainsKey<Section>("Execution"))
                 {
                     RecreateSettings();
                 }
                 else
                 {
-                    if(!Global.Settings.GetItem<Section>("Execution").ContainsKey("FirstRun"))
+                    if (!Global.Settings.GetItem<Section>("Execution").ContainsKey("FirstRun"))
                     {
                         Global.Settings.GetItem<Section>("Execution")["FirstRun"] = false;
                     }
 
-                    if(!Global.Settings.GetItem<Section>("Execution").ContainsKey("LoadPlugins"))
+                    if (!Global.Settings.GetItem<Section>("Execution").ContainsKey("LoadPlugins"))
                     {
                         Global.Settings.GetItem<Section>("Execution")["LoadPlugins"] = true;
                     }
 
-                    if(!Global.Settings.GetItem<Section>("Execution").ContainsKey("Enabled"))
+                    if (!Global.Settings.GetItem<Section>("Execution").ContainsKey("Enabled"))
                     {
                         Global.Settings.GetItem<Section>("Execution")["Enabled"] = true;
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Error($"MANAGER: Couldn't load settings. Defaults loaded. Exception below.\n{ex}");
             }
@@ -186,23 +189,23 @@ namespace Spectrum.Manager
 
         private void LoadExtensions()
         {
-            ManagedPluginContainer = new PluginContainer();
-            ManagedPluginLoader = new PluginLoader(Defaults.ManagerPluginDirectory, ManagedPluginContainer);
-            ManagedPluginLoader.LoadPlugins();
+            PluginRegistry = new PluginRegistry();
+            PluginLoader = new PluginLoader(Defaults.ManagerPluginDirectory, PluginRegistry);
+            PluginLoader.LoadPlugins();
         }
 
         private void StartExtensions()
         {
             Log.Info("Initializing extensions");
 
-            foreach(var pluginInfo in ManagedPluginContainer)
+            foreach (var pluginInfo in PluginRegistry)
             {
                 try
                 {
                     pluginInfo.Instance.Initialize(this);
                     Log.Info($"Plugin {pluginInfo.Manifest.FriendlyName} initialized");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Log.Error($"Plugin {pluginInfo.Manifest.FriendlyName} failed to initialize. Exception below.\n{ex}");
                 }
