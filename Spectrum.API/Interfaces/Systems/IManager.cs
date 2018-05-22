@@ -7,6 +7,6 @@ namespace Spectrum.API.Interfaces.Systems
         IHotkeyManager Hotkeys { get; }
 
         void SendIPC(string ipcIdentifier, IPCData data);
-        bool IsIPCAvailable(string ipcIdentifier);
+        bool IsAvailableForIPC(string ipcIdentifier);
     }
 }

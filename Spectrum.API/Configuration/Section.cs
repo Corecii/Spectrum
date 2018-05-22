@@ -6,6 +6,8 @@ namespace Spectrum.API.Configuration
 {
     public class Section : Dictionary<string, object>
     {
+        public bool Dirty { get; protected set; }
+
         public new object this[string key]
         {
             get
@@ -22,8 +24,11 @@ namespace Spectrum.API.Configuration
                     Add(key, value);
                 else
                     base[key] = value;
+
+                Dirty = true;
             }
         }
+
         public T GetItem<T>(string key)
         {
             if (!ContainsKey(key))

@@ -49,6 +49,8 @@ namespace Spectrum.API.Configuration
                     Save();
                 }
             }
+
+            Dirty = false;
         }
 
         public void Save(bool formatJson = true)
@@ -65,6 +67,8 @@ namespace Spectrum.API.Configuration
             {
                 sw.WriteLine(writer.Write(this));
             }
+
+            Dirty = false;
         }
     }
 }

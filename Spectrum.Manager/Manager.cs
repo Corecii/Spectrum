@@ -73,7 +73,7 @@ namespace Spectrum.Manager
             }
         }
 
-        public bool IsIPCAvailable(string ipcIdentifier)
+        public bool IsAvailableForIPC(string ipcIdentifier)
         {
             return PluginRegistry.GetByIPCIdentifier(ipcIdentifier) != null;
         }
@@ -127,69 +127,50 @@ namespace Spectrum.Manager
 
                 if (!Global.Settings.ContainsKey<Section>("Output"))
                 {
-                    RecreateSettings();
+                    Global.Settings["Output"] = new Section
+                    {
+                        ["LogToConsole"] = true,
+                        ["ShowWatermark"] = true
+                    };
                 }
                 else
                 {
                     if (!Global.Settings.GetItem<Section>("Output").ContainsKey("LogToConsole"))
-                    {
                         Global.Settings.GetItem<Section>("Output")["LogToConsole"] = true;
-                    }
 
                     if (!Global.Settings.GetItem<Section>("Output").ContainsKey("ShowWatermark"))
-                    {
                         Global.Settings.GetItem<Section>("Output")["ShowWatermark"] = true;
-                    }
                 }
 
                 if (!Global.Settings.ContainsKey<Section>("Execution"))
                 {
-                    RecreateSettings();
+                    Global.Settings["Execution"] = new Section
+                    {
+                        ["FirstRun"] = false,
+                        ["LoadPlugins"] = true,
+                        ["Enabled"] = true
+                    };
                 }
                 else
                 {
                     if (!Global.Settings.GetItem<Section>("Execution").ContainsKey("FirstRun"))
-                    {
                         Global.Settings.GetItem<Section>("Execution")["FirstRun"] = false;
-                    }
 
                     if (!Global.Settings.GetItem<Section>("Execution").ContainsKey("LoadPlugins"))
-                    {
                         Global.Settings.GetItem<Section>("Execution")["LoadPlugins"] = true;
-                    }
 
                     if (!Global.Settings.GetItem<Section>("Execution").ContainsKey("Enabled"))
-                    {
                         Global.Settings.GetItem<Section>("Execution")["Enabled"] = true;
-                    }
                 }
+
+                if (Global.Settings.Dirty)
+                    Global.Settings.Save();
             }
             catch (Exception ex)
             {
-                Log.Error($"MANAGER: Couldn't load settings. Defaults loaded. Exception below.\n{ex}");
+                Log.Error($"Couldn't load settings. Defaults loaded. Exception has been caught, see the log for details.");
+                Log.ExceptionSilent(ex);
             }
-        }
-
-        private void RecreateSettings()
-        {
-            Global.Settings.Clear();
-
-            Section sec = new Section
-            {
-                ["LogToConsole"] = true,
-                ["ShowWatermark"] = true
-            };
-            Global.Settings["Output"] = sec;
-
-            sec = new Section
-            {
-                ["FirstRun"] = false,
-                ["LoadPlugins"] = true,
-                ["Enabled"] = true
-            };
-            Global.Settings["Execution"] = sec;
-
-            Global.Settings.Save();
         }
 
         private void LoadExtensions()
