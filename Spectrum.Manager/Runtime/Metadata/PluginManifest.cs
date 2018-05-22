@@ -33,6 +33,9 @@ namespace Spectrum.Manager.Runtime.Metadata
         [JsonName(Name = "Dependencies")]
         public string[] Dependencies;
 
+        [JsonName(Name = "Priority")]
+        public int Priority;
+
         public static PluginManifest FromFile(string filePath)
         {
             string json;
@@ -57,6 +60,16 @@ namespace Spectrum.Manager.Runtime.Metadata
             {
                 throw new MetadataReadException("Failed to deserialize JSON data.", false, json, ex);
             }
+        }
+
+        public bool IsValid()
+        {
+            return (!string.IsNullOrEmpty(FriendlyName)) &&
+                   (!string.IsNullOrEmpty(Author)) &&
+                   (!string.IsNullOrEmpty(AuthorContact)) &&
+                   (!string.IsNullOrEmpty(ModuleFileName)) &&
+                   (!string.IsNullOrEmpty(EntryClassName)) &&
+                   (!string.IsNullOrEmpty(IPCIdentifier));
         }
 
         public override string ToString()
