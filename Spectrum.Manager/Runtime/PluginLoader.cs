@@ -53,7 +53,16 @@ namespace Spectrum.Manager.Runtime
                     manifest = PluginManifest.FromFile(manifestPath);
 
                     if (!manifest.IsValid())
+                    {
+                        Log.Error($"Skipping plugin with invalid manifest. Path: {path}.");
                         continue;
+                    }
+
+                    if(manifest.SkipLoad)
+                    {
+                        Log.Warning($"Manifest declares skip flag, not loading plugin {path}.");
+                        continue;
+                    }
 
                     pluginLoadDataList.Add(new PluginLoadData(path, manifest));
                 }

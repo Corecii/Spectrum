@@ -36,6 +36,9 @@ namespace Spectrum.Manager.Runtime.Metadata
         [JsonName(Name = "Priority")]
         public int Priority;
 
+        [JsonName(Name = "SkipLoad")]
+        public bool SkipLoad;
+
         public static PluginManifest FromFile(string filePath)
         {
             string json;
