@@ -8,7 +8,8 @@ namespace Spectrum.API.Configuration
     {
         private string FileName { get; }
         private string RootDirectory { get; }
-        private string FilePath => Path.Combine(Path.Combine(RootDirectory, Defaults.PrivateSettingsDirectory), FileName);
+        private string SettingsDirectory => Path.Combine(RootDirectory, Defaults.PrivateSettingsDirectory);
+        private string FilePath => Path.Combine(SettingsDirectory, FileName);
 
         public Settings(string fileName)
         {
@@ -52,6 +53,11 @@ namespace Spectrum.API.Configuration
 
         public void Save(bool formatJson = true)
         {
+            if (!Directory.Exists(SettingsDirectory))
+            {
+                Directory.CreateDirectory(SettingsDirectory);
+            }
+
             DataWriterSettings st = new DataWriterSettings { PrettyPrint = formatJson };
             var writer = new JsonFx.Json.JsonWriter(st);
 
