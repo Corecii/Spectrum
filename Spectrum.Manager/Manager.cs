@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Spectrum.API;
 using Spectrum.API.Configuration;
@@ -76,6 +77,23 @@ namespace Spectrum.Manager
         public bool IsAvailableForIPC(string ipcIdentifier)
         {
             return PluginRegistry.GetByIPCIdentifier(ipcIdentifier) != null;
+        }
+
+        public List<PluginInfo> QueryLoadedPlugins()
+        {
+            var list = new List<PluginInfo>();
+            foreach(var loaded in PluginRegistry)
+            {
+                list.Add(new PluginInfo(
+                    loaded.Manifest.FriendlyName,
+                    loaded.Manifest.Author,
+                    loaded.Manifest.AuthorContact,
+                    loaded.Manifest.IPCIdentifier,
+                    loaded.Manifest.Priority
+                ));
+            }
+
+            return list;
         }
 
         public void CheckPaths()

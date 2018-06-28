@@ -55,6 +55,7 @@
     <Compile Include="Defaults.cs" />
     <Compile Include="Exceptions\MetadataReadException.cs" />
     <Compile Include="Exceptions\SettingsException.cs" />
+    <Compile Include="IPC\PluginInfo.cs" />
     <Compile Include="Storage\Assets.cs" />
     <Compile Include="Storage\FileSystem.cs" />
     <Compile Include="Input\Hotkey.cs" />

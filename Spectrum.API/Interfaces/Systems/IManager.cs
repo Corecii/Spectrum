@@ -1,4 +1,5 @@
 ﻿using Spectrum.API.IPC;
+using System.Collections.Generic;
 
 namespace Spectrum.API.Interfaces.Systems
 {
@@ -8,5 +9,7 @@ namespace Spectrum.API.Interfaces.Systems
 
         void SendIPC(string ipcIdentifier, IPCData data);
         bool IsAvailableForIPC(string ipcIdentifier);
+
+        List<PluginInfo> QueryLoadedPlugins();
     }
 }
