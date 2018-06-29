@@ -57,7 +57,12 @@ namespace Spectrum.Manager.Runtime.Metadata
 
             try
             {
-                return new JsonReader().Read<PluginManifest>(json);
+                var manifest = new JsonReader().Read<PluginManifest>(json);
+
+                if (manifest == null)
+                    throw new MetadataReadException("JSON deserializer returned null.", false, json);
+
+                return manifest;
             }
             catch(Exception ex)
             {
