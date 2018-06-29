@@ -20,7 +20,7 @@ namespace Spectrum.Manager.Input
 
             Log = new Logger(Defaults.HotkeyManagerLogFileName)
             {
-                WriteToConsole = Global.Settings.GetItem<Section>("Output").GetItem<bool>("LogToConsole")
+                WriteToConsole = Global.Settings.GetItem<bool>("LogToConsole")
             };
         }
 

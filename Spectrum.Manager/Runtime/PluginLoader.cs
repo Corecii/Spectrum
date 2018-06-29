@@ -26,7 +26,7 @@ namespace Spectrum.Manager.Runtime
 
             Log = new Logger(Defaults.PluginLoaderLogFileName)
             {
-                WriteToConsole = Global.Settings.GetItem<Section>("Output").GetItem<bool>("LogToConsole")
+                WriteToConsole = Global.Settings.GetItem<bool>("LogToConsole")
             };
             Log.Info("Plugin loader starting up...");
         }

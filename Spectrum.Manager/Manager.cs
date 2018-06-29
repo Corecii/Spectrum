@@ -34,7 +34,7 @@ namespace Spectrum.Manager
             CheckPaths();
             InitializeSettings();
 
-            if (!Global.Settings.GetItem<Section>("Execution").GetItem<bool>("Enabled"))
+            if (!Global.Settings.GetItem<bool>("Enabled"))
             {
                 Log.Error("Manager: Spectrum is disabled. Set 'Enabled' entry to 'true' in settings to restore extension framework functionality.");
                 IsEnabled = false;
@@ -44,19 +44,14 @@ namespace Spectrum.Manager
             Hotkeys = new HotkeyManager();
             Scene.Loaded += (sender, args) =>
             {
-                Game.ShowWatermark = Global.Settings.GetItem<Section>("Output").GetItem<bool>("ShowWatermark");
+                Game.ShowWatermark = Global.Settings.GetItem<bool>("ShowWatermark");
 
                 if (Game.ShowWatermark)
-                {
                     Game.WatermarkText = SystemVersion.VersionString;
-                }
             };
 
-            if (Global.Settings.GetItem<Section>("Execution").GetItem<bool>("LoadPlugins"))
-            {
-                LoadExtensions();
-                StartExtensions();
-            }
+            LoadExtensions();
+            StartExtensions();
         }
 
         public void SendIPC(string ipcIdentifierTo, IPCData data)
@@ -143,43 +138,14 @@ namespace Spectrum.Manager
             {
                 Global.Settings = new Settings("ManagerSettings");
 
-                if (!Global.Settings.ContainsKey<Section>("Output"))
-                {
-                    Global.Settings["Output"] = new Section
-                    {
-                        ["LogToConsole"] = true,
-                        ["ShowWatermark"] = true
-                    };
-                }
-                else
-                {
-                    if (!Global.Settings.GetItem<Section>("Output").ContainsKey("LogToConsole"))
-                        Global.Settings.GetItem<Section>("Output")["LogToConsole"] = true;
+                if (!Global.Settings.ContainsKey("LogToConsole"))
+                    Global.Settings["LogToConsole"] = true;
 
-                    if (!Global.Settings.GetItem<Section>("Output").ContainsKey("ShowWatermark"))
-                        Global.Settings.GetItem<Section>("Output")["ShowWatermark"] = true;
-                }
+                if (!Global.Settings.ContainsKey("ShowWatermark"))
+                    Global.Settings["ShowWatermark"] = true;
 
-                if (!Global.Settings.ContainsKey("Execution"))
-                {
-                    Global.Settings["Execution"] = new Section
-                    {
-                        ["FirstRun"] = false,
-                        ["LoadPlugins"] = true,
-                        ["Enabled"] = true
-                    };
-                }
-                else
-                {
-                    if (!Global.Settings.GetItem<Section>("Execution").ContainsKey("FirstRun"))
-                        Global.Settings.GetItem<Section>("Execution")["FirstRun"] = false;
-
-                    if (!Global.Settings.GetItem<Section>("Execution").ContainsKey("LoadPlugins"))
-                        Global.Settings.GetItem<Section>("Execution")["LoadPlugins"] = true;
-
-                    if (!Global.Settings.GetItem<Section>("Execution").ContainsKey("Enabled"))
-                        Global.Settings.GetItem<Section>("Execution")["Enabled"] = true;
-                }
+                if (!Global.Settings.ContainsKey("Enabled"))
+                    Global.Settings["Enabled"] = true;
 
                 if (Global.Settings.Dirty)
                     Global.Settings.Save();
