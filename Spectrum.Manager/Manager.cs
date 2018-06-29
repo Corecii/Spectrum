@@ -160,7 +160,7 @@ namespace Spectrum.Manager
                         Global.Settings.GetItem<Section>("Output")["ShowWatermark"] = true;
                 }
 
-                if (!Global.Settings.ContainsKey<Section>("Execution"))
+                if (!Global.Settings.ContainsKey("Execution"))
                 {
                     Global.Settings["Execution"] = new Section
                     {
@@ -206,7 +206,7 @@ namespace Spectrum.Manager
             {
                 try
                 {
-                    pluginInfo.Instance.Initialize(this);
+                    pluginInfo.Instance.Initialize(this, pluginInfo.Manifest.IPCIdentifier);
                     Log.Info($"Plugin {pluginInfo.Manifest.FriendlyName} initialized");
                 }
                 catch (Exception ex)
