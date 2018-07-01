@@ -10,6 +10,9 @@ namespace Spectrum.API.Interfaces.Systems
         void SendIPC(string ipcIdentifier, IPCData data);
         bool IsAvailableForIPC(string ipcIdentifier);
 
+        bool SetConfig<T>(string key, T value);
+        T GetConfig<T>(string key);
+
         List<PluginInfo> QueryLoadedPlugins();
     }
 }

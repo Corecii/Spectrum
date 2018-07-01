@@ -91,6 +91,29 @@ namespace Spectrum.Manager
             return list;
         }
 
+        public bool SetConfig<T>(string key, T value)
+        {
+            if (!Global.Settings.ContainsKey<T>(key))
+                return false;
+
+            Global.Settings[key] = value;
+            Global.Settings.Save();
+
+            return true;
+        }
+
+        public T GetConfig<T>(string key)
+        {
+            try
+            {
+                return Global.Settings.GetItem<T>(key);
+            }
+            catch
+            {
+                return default(T);
+            }
+        }
+
         public void CheckPaths()
         {
             if (!Directory.Exists(Defaults.ManagerSettingsDirectory))
