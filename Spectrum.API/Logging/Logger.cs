@@ -21,10 +21,9 @@ namespace Spectrum.API.Logging
 
         public Logger(string fileName)
         {
-
             ColorizeLines = true;
 
-            RootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            RootDirectory = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
             FileName = fileName;
 
             Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
