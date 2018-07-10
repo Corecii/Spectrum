@@ -5,7 +5,6 @@ using System.Reflection;
 using Spectrum.API;
 using Spectrum.API.Interfaces.Plugins;
 using Spectrum.API.Logging;
-using Spectrum.API.Configuration;
 using Spectrum.API.Exceptions;
 using Spectrum.Manager.Runtime.Metadata;
 using System.Collections.Generic;
