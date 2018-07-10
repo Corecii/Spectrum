@@ -218,7 +218,7 @@ namespace Spectrum.Manager.Runtime
 
             if (typeof(IIPCEnabled).IsAssignableFrom(entryClassType))
             {
-                Log.Info($"Plugin exports IIPCEnabled interface. This means it can respond and/or communicate with other plugins.");
+                Log.Info($"Plugin exports IIPCEnabled interface. This means it can communicate with other plugins.");
                 pluginHost.IsIPCEnabled = true;
             }
 
