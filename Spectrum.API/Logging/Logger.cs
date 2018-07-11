@@ -8,6 +8,7 @@ namespace Spectrum.API.Logging
     {
         public ConsoleColor ErrorColor { get; set; } = ConsoleColor.Red;
         public ConsoleColor WarningColor { get; set; } = ConsoleColor.Yellow;
+        public ConsoleColor SuccessColor { get; set; } = ConsoleColor.Green;
         public ConsoleColor InfoColor { get; set; } = ConsoleColor.White;
         public ConsoleColor ExceptionColor { get; set; } = ConsoleColor.Magenta;
 
@@ -49,6 +50,17 @@ namespace Spectrum.API.Logging
                 Console.ForegroundColor = WarningColor;
 
             WriteLine($"[*][{DateTime.Now}] {message}");
+
+            if (ColorizeLines)
+                Console.ResetColor();
+        }
+
+        public void Success(string message)
+        {
+            if (ColorizeLines)
+                Console.ForegroundColor = SuccessColor;
+
+            WriteLine($"[+][{DateTime.Now}] {message}");
 
             if (ColorizeLines)
                 Console.ResetColor();
