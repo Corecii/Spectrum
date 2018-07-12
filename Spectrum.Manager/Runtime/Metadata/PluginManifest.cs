@@ -85,7 +85,7 @@ namespace Spectrum.Manager.Runtime.Metadata
             var sb = new StringBuilder();
 
             sb.AppendLine($"Name: {FriendlyName}");
-            sb.AppendLine($"By: {AuthorContact}");
+            sb.AppendLine($"By: {Author} | {AuthorContact}");
             sb.AppendLine($"Module file name: {ModuleFileName}");
             sb.AppendLine($"Entry class name: {EntryClassName}");
             sb.AppendLine($"Compatible API: {CompatibleAPILevel}");
