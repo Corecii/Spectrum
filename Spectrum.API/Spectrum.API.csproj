@@ -53,6 +53,7 @@
     <Compile Include="Configuration\Section.cs" />
     <Compile Include="Configuration\Settings.cs" />
     <Compile Include="Defaults.cs" />
+    <Compile Include="Events\PluginInitializationEventArgs.cs" />
     <Compile Include="Exceptions\MetadataReadException.cs" />
     <Compile Include="Exceptions\SettingsException.cs" />
     <Compile Include="IPC\PluginInfo.cs" />

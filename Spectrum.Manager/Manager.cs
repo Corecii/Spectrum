@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Spectrum.API;
 using Spectrum.API.Configuration;
+using Spectrum.API.Events;
 using Spectrum.API.Interfaces.Plugins;
 using Spectrum.API.Interfaces.Systems;
 using Spectrum.API.IPC;
@@ -17,8 +18,9 @@ namespace Spectrum.Manager
     {
         private PluginRegistry PluginRegistry { get; set; }
         private PluginLoader PluginLoader { get; set; }
-        private Logger Log;
+        private Logger Log { get; }
 
+        public event EventHandler<PluginInitializationEventArgs> PluginInitialized;
         public IHotkeyManager Hotkeys { get; set; }
 
         public bool IsEnabled { get; set; }
@@ -76,19 +78,7 @@ namespace Spectrum.Manager
 
         public List<PluginInfo> QueryLoadedPlugins()
         {
-            var list = new List<PluginInfo>();
-            foreach(var loaded in PluginRegistry)
-            {
-                list.Add(new PluginInfo(
-                    loaded.Manifest.FriendlyName,
-                    loaded.Manifest.Author,
-                    loaded.Manifest.AuthorContact,
-                    loaded.Manifest.IPCIdentifier,
-                    loaded.Manifest.Priority
-                ));
-            }
-
-            return list;
+            return PluginRegistry.QueryLoadedPlugins();
         }
 
         public bool SetConfig<T>(string key, T value)
@@ -191,16 +181,23 @@ namespace Spectrum.Manager
         {
             Log.Info("Initializing extensions");
 
-            foreach (var pluginInfo in PluginRegistry)
+            for (var i = 0; i < PluginRegistry.Count; i++)
             {
+                var pluginHost = PluginRegistry[i];
+
                 try
                 {
-                    pluginInfo.Instance.Initialize(this, pluginInfo.Manifest.IPCIdentifier);
-                    Log.Info($"Plugin {pluginInfo.Manifest.FriendlyName} initialized");
+                    var pluginInfo = PluginRegistry.GetPluginInfoByName(pluginHost.Manifest.FriendlyName);
+                    var isLastPlugin = (i == PluginRegistry.Count - 1);
+
+                    pluginHost.Instance.Initialize(this, pluginHost.Manifest.IPCIdentifier);
+                    PluginInitialized?.Invoke(this, new PluginInitializationEventArgs(pluginInfo, isLastPlugin));
+
+                    Log.Info($"Plugin {pluginHost.Manifest.FriendlyName} initialized");
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"Plugin {pluginInfo.Manifest.FriendlyName} failed to initialize. Exception below.\n{ex}");
+                    Log.Error($"Plugin {pluginHost.Manifest.FriendlyName} failed to initialize. Exception below.\n{ex}");
                 }
             }
 

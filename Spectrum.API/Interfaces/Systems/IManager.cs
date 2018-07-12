@@ -1,10 +1,14 @@
-﻿using Spectrum.API.IPC;
+﻿using Spectrum.API.Events;
+using Spectrum.API.IPC;
+using System;
 using System.Collections.Generic;
 
 namespace Spectrum.API.Interfaces.Systems
 {
     public interface IManager
     {
+        event EventHandler<PluginInitializationEventArgs> PluginInitialized;
+
         IHotkeyManager Hotkeys { get; }
 
         void SendIPC(string ipcIdentifier, IPCData data);
