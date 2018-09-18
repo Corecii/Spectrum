@@ -77,6 +77,7 @@ namespace Spectrum.Manager.Runtime
             {
                 LoadPlugin(pluginLoadData);
             }
+            Log.Info($"Plugin load finished, loaded {PluginRegistry.Count} plugins.");
         }
 
         public void LoadPlugin(PluginLoadData loadData)

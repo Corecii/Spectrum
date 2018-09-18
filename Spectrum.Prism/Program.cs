@@ -134,8 +134,6 @@ namespace Spectrum.Prism
 
             _patcher.AddPatch(new SpectrumInitCodePatch());
             _patcher.AddPatch(new SpectrumUpdateCodePatch());
-            _patcher.AddPatch(new DevModeEnablePatch());
-            _patcher.AddPatch(new DiscordRPCPatch());
         }
 
         private static void RunPatches()

@@ -57,38 +57,38 @@ namespace Spectrum.Interop.Game
         // All volume meters are values from 0.0 to 1.0 (0% - 100%)
         public static float AmbientVolume
         {
-            get { return G.Sys.AudioManager_.GetAmbientVolume(); }
-            set { G.Sys.AudioManager_.SetAmbientVolume(value); }
+            get { return AudioManager.GetAmbientVolume(); }
+            set { AudioManager.SetAmbientVolume(value); }
         }
 
         public static float MasterVolume
         {
-            get { return G.Sys.AudioManager_.GetMasterVolume(); }
-            set { G.Sys.AudioManager_.SetMasterVolume(value); }
+            get { return AudioManager.GetMasterVolume(); }
+            set { AudioManager.SetMasterVolume(value); }
         }
 
         public static float MenuVolume
         {
-            get { return G.Sys.AudioManager_.GetMenuVolume(); }
-            set { G.Sys.AudioManager_.SetMenuVolume(value); }
+            get { return AudioManager.GetMenuVolume(); }
+            set { AudioManager.SetMenuVolume(value); }
         }
 
         public static float MusicVolume
         {
-            get { return G.Sys.AudioManager_.GetMusicVolume(); }
-            set { G.Sys.AudioManager_.SetMusicVolume(value); }
+            get { return AudioManager.GetMusicVolume(); }
+            set { AudioManager.SetMusicVolume(value); }
         }
 
         public static float ObstacleVolume
         {
-            get { return G.Sys.AudioManager_.GetObstacleVolume(); }
-            set { G.Sys.AudioManager_.SetObstacleVolume(value); }
+            get { return AudioManager.GetObstacleVolume(); }
+            set { AudioManager.SetObstacleVolume(value); }
         }
 
         public static float VehicleVolume
         {
-            get { return G.Sys.AudioManager_.GetCarVolume(); }
-            set { G.Sys.AudioManager_.SetCarVolume(value); }
+            get { return AudioManager.GetCarVolume(); }
+            set { AudioManager.SetCarVolume(value); }
         }
 
         public static string CustomMusicDirectory

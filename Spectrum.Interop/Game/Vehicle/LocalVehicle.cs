@@ -101,7 +101,7 @@ namespace Spectrum.Interop.Game.Vehicle
             {
                 if (sender.GetComponent<PlayerDataLocal>())
                 {
-                    var eventArgs = new CheckpointHitEventArgs(data.checkpointIndex_, data.trackT_);
+                    var eventArgs = new CheckpointHitEventArgs(data.handle_.Instance_.BankID_, data.trackT_);
                     CheckpointPassed?.Invoke(null, eventArgs);
                 }
             });

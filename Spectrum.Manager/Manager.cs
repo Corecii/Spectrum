@@ -44,13 +44,6 @@ namespace Spectrum.Manager
             }
 
             Hotkeys = new HotkeyManager();
-            Scene.Loaded += (sender, args) =>
-            {
-                Game.ShowWatermark = Global.Settings.GetItem<bool>("ShowWatermark");
-
-                if (Game.ShowWatermark)
-                    Game.WatermarkText = SystemVersion.VersionString;
-            };
 
             LoadExtensions();
             StartExtensions();
@@ -153,9 +146,6 @@ namespace Spectrum.Manager
 
                 if (!Global.Settings.ContainsKey("LogToConsole"))
                     Global.Settings["LogToConsole"] = true;
-
-                if (!Global.Settings.ContainsKey("ShowWatermark"))
-                    Global.Settings["ShowWatermark"] = true;
 
                 if (!Global.Settings.ContainsKey("Enabled"))
                     Global.Settings["Enabled"] = true;
