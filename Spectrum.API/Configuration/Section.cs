@@ -1,6 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Spectrum.API.Exceptions;
+using System;
+using System.Collections.Generic;
 
 namespace Spectrum.API.Configuration
 {
@@ -29,20 +31,47 @@ namespace Spectrum.API.Configuration
             }
         }
 
+        public T GetOrCreate<T>(string key) where T : new()
+        {
+            if (!ContainsKey(key))
+                this[key] = new T();
+
+            return GetItem<T>(key);
+        }
+
+        public T GetOrCreate<T>(string key, T defaultValue)
+        {
+            if (!ContainsKey(key))
+                this[key] = defaultValue;
+
+            return GetItem<T>(key);
+        }
+
         public T GetItem<T>(string key)
         {
             if (!ContainsKey(key))
-            {
-                throw new SettingsException("The value you want to retrieve does not exist.", key);
-            }
+                throw new KeyNotFoundException($"The key requested doesn't exist in store: '{key}'.");
 
             try
             {
+                if (this[key] is JObject jObject)
+                    return jObject.ToObject<T>();
+
+                if (this[key] is JArray jArray)
+                    return jArray.ToObject<T>();
+
+                if (this[key] is JToken jToken)
+                    return jToken.ToObject<T>();
+
                 return (T)Convert.ChangeType(this[key], typeof(T));
             }
-            catch
+            catch (JsonException je)
             {
-                throw new SettingsException("Couldn't load value in requested type", key);
+                throw new SettingsException("Failed to convert a JSON token to the requested type.", key, true, je);
+            }
+            catch (Exception e)
+            {
+                throw new SettingsException($".NET type conversion exception has been thrown.", key, false, e);
             }
         }
 

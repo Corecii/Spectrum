@@ -17,10 +17,12 @@ namespace Spectrum.API
         public static string ManagerLogDirectory => Path.Combine(BasePath, "Logs");
         public static string ManagerSettingsDirectory => Path.Combine(BasePath, "Settings");
 
-        public const string HotkeyManagerLogFileName = "HotkeyManager.log";
-        public const string PluginLoaderLogFileName = "PluginLoader.log";
-        public const string DependencyResolverLogFileName = "DependencyResolver.log";
-        public const string FileSystemLogFileName = "FileSystem.log";
-        public const string RuntimeAssetLoaderLogFileName = "RuntimeAssetLoader.log";
+        public const string HotkeyManagerLogFileName = "HotkeyManager";
+        public const string PluginLoaderLogFileName = "PluginLoader";
+        public const string DependencyResolverLogFileName = "DependencyResolver";
+        public const string FileSystemLogFileName = "FileSystem";
+        public const string RuntimeAssetLoaderLogFileName = "RuntimeAssetLoader";
+        public const string SettingsSystemLogFileName = "SettingsSystem";
+        public const string ManagerLogFileName = "Manager";
     }
 }

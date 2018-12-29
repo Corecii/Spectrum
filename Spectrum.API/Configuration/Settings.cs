@@ -1,11 +1,16 @@
+using System;
 using System.IO;
 using System.Reflection;
-using JsonFx.Serialization;
+using Newtonsoft.Json;
+using Spectrum.API.Logging;
 
 namespace Spectrum.API.Configuration
 {
     public class Settings : Section
     {
+        private static Logger _logger;
+        private static Logger Logger => _logger ?? (_logger = new Logger(Defaults.SettingsSystemLogFileName) { WriteToConsole = true });
+
         private string FileName { get; }
         private string RootDirectory { get; }
         private string SettingsDirectory => Path.Combine(RootDirectory, Defaults.PrivateSettingsDirectory);
@@ -16,31 +21,38 @@ namespace Spectrum.API.Configuration
             RootDirectory = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
             FileName = $"{fileName}.json";
 
+            Logger.Info($"Settings instance for '{FilePath}' initializing...");
+
             if (File.Exists(FilePath))
             {
                 var saveLater = false;
                 using (var sr = new StreamReader(FilePath))
                 {
                     var json = sr.ReadToEnd();
-                    var reader = new JsonFx.Json.JsonReader();
-
                     Section sec = null;
 
                     try
                     {
-                        sec = reader.Read<Section>(json);
+                        sec = JsonConvert.DeserializeObject<Section>(json);
                     }
-                    catch
+                    catch (JsonException je)
                     {
-                        saveLater = true;
+                        sec = new Section();
+                        saveLater = false;
+
+                        Logger.Error($"Could not deserialize JSON in '{FilePath}'. Probably a syntax error. Check the log file for details.");
+                        Logger.ExceptionSilent(je);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error($"Unexpected exception occured while loading file {FilePath}. Check the log file for details.");
+                        Logger.ExceptionSilent(e);
                     }
 
                     if (sec != null)
                     {
                         foreach (string k in sec.Keys)
-                        {
                             Add(k, sec[k]);
-                        }
                     }
                 }
 
@@ -56,19 +68,25 @@ namespace Spectrum.API.Configuration
         public void Save(bool formatJson = true)
         {
             if (!Directory.Exists(SettingsDirectory))
-            {
                 Directory.CreateDirectory(SettingsDirectory);
-            }
 
-            DataWriterSettings st = new DataWriterSettings { PrettyPrint = formatJson };
-            var writer = new JsonFx.Json.JsonWriter(st);
-
-            using (var sw = new StreamWriter(FilePath, false))
+            try
             {
-                sw.WriteLine(writer.Write(this));
-            }
+                using (var sw = new StreamWriter(FilePath, false))
+                    sw.WriteLine(JsonConvert.SerializeObject(this));
 
-            Dirty = false;
+                Dirty = false;
+            }
+            catch(JsonException je)
+            {
+                Logger.Error($"Could not serialize the settings object back to JSON for '{FilePath}'. See the log file for details.");
+                Logger.ExceptionSilent(je);
+            }
+            catch(Exception e)
+            {
+                Logger.Error($"An unexpected exception occured while saving '{FilePath}'. See the log file for details.");
+                Logger.ExceptionSilent(e);
+            }
         }
     }
 }

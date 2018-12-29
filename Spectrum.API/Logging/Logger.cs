@@ -25,7 +25,7 @@ namespace Spectrum.API.Logging
             ColorizeLines = true;
 
             RootDirectory = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
-            FileName = fileName;
+            FileName = $"{fileName}.log";
 
             Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
 
@@ -74,13 +74,9 @@ namespace Spectrum.API.Logging
             var msg = $"[i][{DateTime.Now}] {message}";
 
             if (noNewLine)
-            {
                 Write(msg);
-            }
             else
-            {
                 WriteLine(msg);
-            }
 
             if (ColorizeLines)
                 Console.ResetColor();
@@ -97,56 +93,46 @@ namespace Spectrum.API.Logging
                 Console.ResetColor();
 
             WriteLine($"   Target site: {e.TargetSite}");
+
             WriteLine("   Stack trace:");
-            foreach (var s in e.StackTrace.Split('\n'))
-            {
+
+            foreach (var s in e.StackTrace.Split(Environment.NewLine.ToCharArray()))
                 WriteLine($"      {s}");
-            }
         }
 
         public void ExceptionSilent(Exception e)
         {
             WriteLineSilent($"[e][{DateTime.Now}] {e.Message}");
             WriteLineSilent($"   Target site: {e.TargetSite}");
+
             WriteLineSilent("   Stack trace:");
-            foreach (var s in e.StackTrace.Split('\n'))
-            {
+
+            foreach (var s in e.StackTrace.Split(Environment.NewLine.ToCharArray()))
                 WriteLineSilent($"      {s}");
-            }
         }
 
         public void WriteLine(string text)
         {
             using (var sw = new StreamWriter(FilePath, true))
-            {
                 sw.WriteLine(text);
-            }
 
             if (WriteToConsole)
-            {
                 Console.WriteLine(text);
-            }
         }
 
         private void WriteLineSilent(string text)
         {
             using (var sw = new StreamWriter(FilePath, true))
-            {
                 sw.WriteLine(text);
-            }
         }
 
         private void Write(string text)
         {
             using (var sw = new StreamWriter(FilePath, true))
-            {
                 sw.Write(text);
-            }
 
             if (WriteToConsole)
-            {
                 Console.Write(text);
-            }
         }
     }
 }
