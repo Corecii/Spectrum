@@ -26,6 +26,15 @@ namespace Spectrum.Bootstrap
             if (!string.IsNullOrEmpty(e.StackTrace))
                 Console.WriteLine(e.StackTrace);
 
+            if (e.InnerException != null)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("-------------- INNER EXCEPTION FOLLOWS --------------");
+                Console.ForegroundColor = ConsoleColor.Magenta;
+
+                Exception(e.InnerException);
+            }
+
             Console.ResetColor();
         }
 
