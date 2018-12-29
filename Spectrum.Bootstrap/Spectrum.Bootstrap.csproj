@@ -35,6 +35,7 @@
     <Compile Include="ConsoleAllocator.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="StartupArguments.cs" />
     <Compile Include="Updater.cs" />
   </ItemGroup>

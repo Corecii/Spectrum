@@ -20,7 +20,7 @@ namespace Spectrum.Bootstrap
             {
                 if (_updateRetryCount <= 10)
                 {
-                    Console.WriteLine($"[STAGE 1] Spectrum: Can't update extensions. Read below:\n{ex}");
+                    Log.Exception(ex);
                     _updateRetryCount++;
                 }
             }

@@ -24,12 +24,13 @@ namespace Spectrum.Bootstrap
                     if (IsMonoPlatform() && IsUnix())
                     {
                         ConsoleAllocator.CreateUnix();
-                        Console.WriteLine("Running on non-Windows platform. Skipping AllocConsole()...");
+                        Log.Info("Running on non-Windows platform. Skipping AllocConsole()...");
                     }
                     else
                     {
-                        ConsoleAllocator.Create();
+                        ConsoleAllocator.CreateWin32();
                     }
+
                     var version = Assembly.GetAssembly(typeof(Loader)).GetName().Version;
 
                     Console.WriteLine($"Spectrum Extension System for Distance. Version {version.Major}.{version.Minor}.{version.Build}.{version.Revision}.");
@@ -40,10 +41,11 @@ namespace Spectrum.Bootstrap
 
             if (!File.Exists(ManagerDllPath))
             {
-                Console.WriteLine($"[STAGE1] Spectrum: Can't find the plug-in manager at path {ManagerDllPath}.");
+                Log.Error($"Could not find Spectrum Plugin Manager assembly at {ManagerDllPath}. Terminating.");
                 return;
             }
-            Console.WriteLine($"Located Spectrum manager at {ManagerDllPath}");
+
+            Log.Info($"Located Spectrum Plugin Manager assembly at {ManagerDllPath}");
 
             try
             {
@@ -52,14 +54,17 @@ namespace Spectrum.Bootstrap
 
                 if (managerType == null)
                 {
-                    Console.WriteLine("[STAGE1] Spectrum: Invalid plug-in manager assembly loaded.");
+                    Log.Error("Could not find the correct type 'Spectrum.Manager.Manager' in the loaded Spectrum Plugin Manager assembly. Terminating.");
                     return;
                 }
+
+                Log.Info("Bootstrap process finished, passing control to Spectrum Plugin Manager.");
                 Updater.ManagerObject = Activator.CreateInstance(managerType);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[STAGE1] Spectrum: Critical exception handled. Read below:\n{ex}");
+                Log.Error("Unexpected initalization failure occured. Exception follows.");
+                Log.Exception(ex);
             }
         }
 

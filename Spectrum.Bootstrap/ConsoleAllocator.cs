@@ -11,7 +11,7 @@ namespace Spectrum.Bootstrap
 
         private static bool _allocated;
 
-        public static void Create()
+        public static void CreateWin32()
         {
             if (_allocated)
                 return;
@@ -19,6 +19,16 @@ namespace Spectrum.Bootstrap
             AllocConsole();
             RecreateOutputStream();
             _allocated = true;
+        }
+        public static void DestroyWin32()
+        {
+            if (!_allocated)
+                return;
+
+            FreeConsole();
+
+            Console.SetOut(_originalStream);
+            _allocated = false;
         }
 
         public static void CreateUnix()
@@ -28,17 +38,6 @@ namespace Spectrum.Bootstrap
             
             RecreateOutputStream();
             _allocated = true;
-        }
-
-        public static void Destroy()
-        {
-            if (!_allocated)
-                return;
-
-            FreeConsole();
-
-            Console.SetOut(_originalStream);
-            _allocated = false;
         }
 
         public static void DestroyUnix()
