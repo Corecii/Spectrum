@@ -57,7 +57,7 @@ namespace Spectrum.Manager.Runtime
                         continue;
                     }
 
-                    if(manifest.SkipLoad)
+                    if (manifest.SkipLoad)
                     {
                         Log.Warning($"Manifest declares skip flag, not loading plugin {path}.");
                         continue;
@@ -67,7 +67,7 @@ namespace Spectrum.Manager.Runtime
                 }
                 catch (MetadataReadException mre)
                 {
-                    Log.Error($"Error reading manifest:  {mre.Message}");
+                    Log.Error($"Error reading manifest: {mre.Message}\nException: {mre.InnerException}");
                     continue;
                 }
             }
@@ -85,7 +85,7 @@ namespace Spectrum.Manager.Runtime
             string path = loadData.DirectoryPath;
             PluginManifest manifest = loadData.Manifest;
 
-            Log.Info($"Trying to load the plugin according to the following manifest:\n{manifest}");
+            Log.Info($"Trying to load the plugin according to the following manifest:\n{manifest}", true);
 
             if (PluginRegistry.GetByName(manifest.FriendlyName) != null)
             {
@@ -139,7 +139,7 @@ namespace Spectrum.Manager.Runtime
             }
             catch (Exception e)
             {
-                Log.Error("Couldn't load target module assembly.");
+                Log.Error("Couldn't load target module assembly. Exception has been silently logged.");
                 Log.ExceptionSilent(e);
 
                 return;
@@ -199,16 +199,13 @@ namespace Spectrum.Manager.Runtime
                 return;
             }
 
-            var pluginHost = new PluginHost()
+            var pluginHost = new PluginHost
             {
                 Manifest = manifest,
                 RootDirectory = path,
                 Enabled = true,
                 Instance = instance
             };
-
-            if (manifest.CompatibleAPILevel != SystemVersion.APILevel)
-                Log.Warning($"Plugin assembly {manifest.ModuleFileName} declares that it was compiled for an earlier Spectrum version. Expect unexpected.");
 
             if (typeof(IUpdatable).IsAssignableFrom(entryClassType))
             {
@@ -218,12 +215,20 @@ namespace Spectrum.Manager.Runtime
 
             if (typeof(IIPCEnabled).IsAssignableFrom(entryClassType))
             {
-                Log.Info($"Plugin exports IIPCEnabled interface. This means it can communicate with other plugins.");
-                pluginHost.IsIPCEnabled = true;
+                if (!string.IsNullOrEmpty(manifest.IPCIdentifier))
+                {
+                    Log.Info($"Plugin exports IIPCEnabled interface. This means it can communicate with other plugins.");
+                    pluginHost.IsIPCEnabled = true;
+                }
+                else
+                {
+                    Log.Error($"Plugin exports IIPCEnabled interface, but does not provide an IPC identifier in manifest. IPC for this plugin will be disabled.");
+                    pluginHost.IsIPCEnabled = false;
+                }
             }
 
             PluginRegistry.Add(pluginHost);
-            Log.Info($"Plugin assembly {manifest.ModuleFileName} has been loaded.");
+            Log.Success($"Plugin assembly {manifest.ModuleFileName} has been loaded.\n");
         }
     }
 }

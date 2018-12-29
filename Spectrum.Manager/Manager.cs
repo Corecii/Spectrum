@@ -8,7 +8,6 @@ using Spectrum.API.Interfaces.Plugins;
 using Spectrum.API.Interfaces.Systems;
 using Spectrum.API.IPC;
 using Spectrum.API.Logging;
-using Spectrum.Interop.Game;
 using Spectrum.Manager.Input;
 using Spectrum.Manager.Runtime;
 
@@ -28,8 +27,8 @@ namespace Spectrum.Manager
 
         public Manager()
         {
-            Log = new Logger("Manager.log");
-            Log.Info("Manager started");
+            Log = new Logger(Defaults.ManagerLogFileName);
+            Log.Info("Manager started.");
 
             IsEnabled = true;
 
@@ -38,8 +37,9 @@ namespace Spectrum.Manager
 
             if (!Global.Settings.GetItem<bool>("Enabled"))
             {
-                Log.Error("Manager: Spectrum is disabled. Set 'Enabled' entry to 'true' in settings to restore extension framework functionality.");
+                Log.Error("Spectrum is disabled. Set 'Enabled' entry to 'true' in settings to restore extension framework functionality.");
                 IsEnabled = false;
+
                 return;
             }
 
@@ -56,7 +56,7 @@ namespace Spectrum.Manager
             {
                 if (!pluginHost.IsIPCEnabled)
                 {
-                    Log.Error($"Plugin with IPC ID {data.SourceIdentifier} tried to send IPCData to {ipcIdentifierTo}, but target is not IPC enabled.");
+                    Log.Error($"Plugin with IPC ID {data.SourceIdentifier} tried to send IPCData to {ipcIdentifierTo}, but the target is not IPC enabled.");
                     return;
                 }
 
@@ -91,8 +91,9 @@ namespace Spectrum.Manager
             {
                 return Global.Settings.GetItem<T>(key);
             }
-            catch
+            catch (Exception ex)
             {
+                Log.ExceptionSilent(ex);
                 return default(T);
             }
         }
@@ -163,6 +164,7 @@ namespace Spectrum.Manager
         private void LoadExtensions()
         {
             PluginRegistry = new PluginRegistry();
+
             PluginLoader = new PluginLoader(Defaults.ManagerPluginDirectory, PluginRegistry);
             PluginLoader.LoadPlugins();
         }

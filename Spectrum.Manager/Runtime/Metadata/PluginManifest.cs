@@ -1,4 +1,4 @@
-﻿using JsonFx.Json;
+﻿using Newtonsoft.Json;
 using Spectrum.API;
 using Spectrum.API.Exceptions;
 using System;
@@ -9,34 +9,31 @@ namespace Spectrum.Manager.Runtime.Metadata
 {
     public class PluginManifest
     {
-        [JsonName(Name = "FriendlyName")]
+        [JsonProperty("FriendlyName", Required = Required.Always)]
         public string FriendlyName;
 
-        [JsonName(Name = "Author")]
+        [JsonProperty("Author")]
         public string Author;
 
-        [JsonName(Name = "AuthorContact")]
+        [JsonProperty("AuthorContact")]
         public string AuthorContact;
 
-        [JsonName(Name = "ModuleFileName")]
+        [JsonProperty("ModuleFileName", Required = Required.Always)]
         public string ModuleFileName;
 
-        [JsonName(Name = "EntryClassName")]
+        [JsonProperty("EntryClassName", Required = Required.Always)]
         public string EntryClassName;
 
-        [JsonName(Name = "IPCIdentifier")]
+        [JsonProperty("IPCIdentifier")]
         public string IPCIdentifier;
 
-        [JsonName(Name = "CompatibleAPILevel")]
-        public APILevel CompatibleAPILevel;
-
-        [JsonName(Name = "Dependencies")]
+        [JsonProperty("Dependencies")]
         public string[] Dependencies;
 
-        [JsonName(Name = "Priority")]
-        public int Priority;
+        [JsonProperty("Priority")]
+        public int? Priority;
 
-        [JsonName(Name = "SkipLoad")]
+        [JsonProperty("SkipLoad")]
         public bool SkipLoad;
 
         public static PluginManifest FromFile(string filePath)
@@ -45,39 +42,41 @@ namespace Spectrum.Manager.Runtime.Metadata
 
             try
             {
-                using(var sr = new StreamReader(filePath))
-                {
+                using (var sr = new StreamReader(filePath))
                     json = sr.ReadToEnd();
-                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                throw new MetadataReadException("Failed to open the file.", true, string.Empty, ex);
+                throw new MetadataReadException("Failed to open the manifest file.", true, string.Empty, ex);
             }
 
             try
             {
-                var manifest = new JsonReader().Read<PluginManifest>(json);
+                var manifest = JsonConvert.DeserializeObject<PluginManifest>(json);
+
+                if (manifest.Priority == null)
+                    manifest.Priority = 10;
 
                 if (manifest == null)
                     throw new MetadataReadException("JSON deserializer returned null.", false, json);
 
                 return manifest;
             }
-            catch(Exception ex)
+            catch (JsonException je)
             {
-                throw new MetadataReadException("Failed to deserialize JSON data.", false, json, ex);
+                throw new MetadataReadException("Failed to deserialize JSON data.", false, json, je);
+            }
+            catch (Exception e)
+            {
+                throw new MetadataReadException("Unexpected metadata read exception occured.", false, json, e);
             }
         }
 
         public bool IsValid()
         {
             return (!string.IsNullOrEmpty(FriendlyName)) &&
-                   (!string.IsNullOrEmpty(Author)) &&
-                   (!string.IsNullOrEmpty(AuthorContact)) &&
                    (!string.IsNullOrEmpty(ModuleFileName)) &&
-                   (!string.IsNullOrEmpty(EntryClassName)) &&
-                   (!string.IsNullOrEmpty(IPCIdentifier));
+                   (!string.IsNullOrEmpty(EntryClassName));
         }
 
         public override string ToString()
@@ -85,15 +84,22 @@ namespace Spectrum.Manager.Runtime.Metadata
             var sb = new StringBuilder();
 
             sb.AppendLine($"Name: {FriendlyName}");
-            sb.AppendLine($"By: {Author} | {AuthorContact}");
             sb.AppendLine($"Module file name: {ModuleFileName}");
             sb.AppendLine($"Entry class name: {EntryClassName}");
-            sb.AppendLine($"Compatible API: {CompatibleAPILevel}");
 
-            if(Dependencies != null && Dependencies.Length > 0)
+            if(!string.IsNullOrEmpty(IPCIdentifier))
+                sb.AppendLine($"Declared IPC identifier: {IPCIdentifier}");
+
+            if (!string.IsNullOrEmpty(Author))
+                sb.AppendLine($"By: {Author}");
+
+            if (!string.IsNullOrEmpty(AuthorContact))
+                sb.AppendLine($"Contact: {AuthorContact}");
+
+            if (Dependencies != null && Dependencies.Length > 0)
             {
                 sb.AppendLine($"Dependencies: ");
-                foreach(var str in Dependencies)
+                foreach (var str in Dependencies)
                 {
                     sb.AppendLine($"  {str}");
                 }

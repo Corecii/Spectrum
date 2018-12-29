@@ -12,9 +12,8 @@ namespace Spectrum.Manager.Runtime
         {
             var plugin = GetByName(name);
             if (plugin == null)
-            {
                 return false;
-            }
+
             plugin.Enabled = enabled;
             return true;
         }
@@ -43,12 +42,11 @@ namespace Spectrum.Manager.Runtime
                     loaded.Manifest.Author,
                     loaded.Manifest.AuthorContact,
                     loaded.Manifest.IPCIdentifier,
-                    loaded.Manifest.Priority
+                    loaded.Manifest.Priority ?? 10
                 ));
             }
 
             PluginDataCache = list;
-
             return list;
         }
 
