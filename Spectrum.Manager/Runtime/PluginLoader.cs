@@ -8,6 +8,8 @@ using Spectrum.API.Logging;
 using Spectrum.API.Exceptions;
 using Spectrum.Manager.Runtime.Metadata;
 using System.Collections.Generic;
+using System.Text;
+using Spectrum.API.Extensions;
 
 namespace Spectrum.Manager.Runtime
 {
@@ -50,12 +52,24 @@ namespace Spectrum.Manager.Runtime
                 try
                 {
                     manifest = PluginManifest.FromFile(manifestPath);
+                    var validationFlags = manifest.Validate();
 
-                    if (!manifest.IsValid())
+                    if (validationFlags != 0) 
                     {
-                        Log.Error($"Skipping plugin with invalid manifest. Path: {path}.");
+                        var sb = new StringBuilder();
+
+                        if (validationFlags.HasFlag(ManifestValidationFlags.MissingFriendlyName))
+                            sb.AppendLine("   - Missing friendly name.");
+
+                        if (validationFlags.HasFlag(ManifestValidationFlags.MissingModuleFileName))
+                            sb.AppendLine("   - Missing module file name.");
+
+                        if (validationFlags.HasFlag(ManifestValidationFlags.MissingEntryClassName))
+                            sb.AppendLine("   - Missing entry class name.");
+
+                        Log.Error($"The manifest in '{path}' has following issues:\n{sb.ToString()}The plugin in question has been skipped.\n");
                         continue;
-                    }
+                    } // If there's no flags set, it means it's valid.
 
                     if (manifest.SkipLoad)
                     {

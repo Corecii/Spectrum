@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Spectrum.API;
 using Spectrum.API.Exceptions;
 using System;
 using System.IO;
@@ -9,7 +8,7 @@ namespace Spectrum.Manager.Runtime.Metadata
 {
     public class PluginManifest
     {
-        [JsonProperty("FriendlyName", Required = Required.Always)]
+        [JsonProperty("FriendlyName")]
         public string FriendlyName;
 
         [JsonProperty("Author")]
@@ -18,10 +17,10 @@ namespace Spectrum.Manager.Runtime.Metadata
         [JsonProperty("AuthorContact")]
         public string AuthorContact;
 
-        [JsonProperty("ModuleFileName", Required = Required.Always)]
+        [JsonProperty("ModuleFileName")]
         public string ModuleFileName;
 
-        [JsonProperty("EntryClassName", Required = Required.Always)]
+        [JsonProperty("EntryClassName")]
         public string EntryClassName;
 
         [JsonProperty("IPCIdentifier")]
@@ -54,11 +53,11 @@ namespace Spectrum.Manager.Runtime.Metadata
             {
                 var manifest = JsonConvert.DeserializeObject<PluginManifest>(json);
 
-                if (manifest.Priority == null)
-                    manifest.Priority = 10;
-
                 if (manifest == null)
                     throw new MetadataReadException("JSON deserializer returned null.", false, json);
+
+                if (manifest.Priority == null)
+                    manifest.Priority = 10;
 
                 return manifest;
             }
@@ -72,11 +71,20 @@ namespace Spectrum.Manager.Runtime.Metadata
             }
         }
 
-        public bool IsValid()
+        public ManifestValidationFlags Validate()
         {
-            return (!string.IsNullOrEmpty(FriendlyName)) &&
-                   (!string.IsNullOrEmpty(ModuleFileName)) &&
-                   (!string.IsNullOrEmpty(EntryClassName));
+            ManifestValidationFlags flags = 0;
+
+            if (string.IsNullOrEmpty(FriendlyName))
+                flags |= ManifestValidationFlags.MissingFriendlyName;
+
+            if (string.IsNullOrEmpty(ModuleFileName))
+                flags |= ManifestValidationFlags.MissingModuleFileName;
+
+            if (string.IsNullOrEmpty(EntryClassName))
+                flags |= ManifestValidationFlags.MissingEntryClassName;
+
+            return flags;
         }
 
         public override string ToString()
@@ -87,7 +95,7 @@ namespace Spectrum.Manager.Runtime.Metadata
             sb.AppendLine($"Module file name: {ModuleFileName}");
             sb.AppendLine($"Entry class name: {EntryClassName}");
 
-            if(!string.IsNullOrEmpty(IPCIdentifier))
+            if (!string.IsNullOrEmpty(IPCIdentifier))
                 sb.AppendLine($"Declared IPC identifier: {IPCIdentifier}");
 
             if (!string.IsNullOrEmpty(Author))
@@ -98,7 +106,7 @@ namespace Spectrum.Manager.Runtime.Metadata
 
             if (Dependencies != null && Dependencies.Length > 0)
             {
-                sb.AppendLine($"Dependencies: ");
+                sb.AppendLine($"Declared dependencies: ");
                 foreach (var str in Dependencies)
                 {
                     sb.AppendLine($"  {str}");
