@@ -4,7 +4,6 @@ using Spectrum.API;
 using Spectrum.API.Input;
 using Spectrum.API.Interfaces.Systems;
 using Spectrum.API.Logging;
-using Spectrum.API.Configuration;
 
 namespace Spectrum.Manager.Input
 {

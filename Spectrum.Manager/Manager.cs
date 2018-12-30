@@ -145,11 +145,8 @@ namespace Spectrum.Manager
             {
                 Global.Settings = new Settings("ManagerSettings");
 
-                if (!Global.Settings.ContainsKey("LogToConsole"))
-                    Global.Settings["LogToConsole"] = true;
-
-                if (!Global.Settings.ContainsKey("Enabled"))
-                    Global.Settings["Enabled"] = true;
+                Global.Settings.GetOrCreate("LogToConsole", true);
+                Global.Settings.GetOrCreate("Enabled", true);
 
                 if (Global.Settings.Dirty)
                     Global.Settings.Save();
