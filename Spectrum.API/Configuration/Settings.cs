@@ -25,7 +25,6 @@ namespace Spectrum.API.Configuration
 
             if (File.Exists(FilePath))
             {
-                var saveLater = false;
                 using (var sr = new StreamReader(FilePath))
                 {
                     var json = sr.ReadToEnd();
@@ -37,9 +36,6 @@ namespace Spectrum.API.Configuration
                     }
                     catch (JsonException je)
                     {
-                        sec = new Section();
-                        saveLater = false;
-
                         Logger.Error($"Could not deserialize JSON in '{FilePath}'. Probably a syntax error. Check the log file for details.");
                         Logger.ExceptionSilent(je);
                     }
@@ -55,13 +51,7 @@ namespace Spectrum.API.Configuration
                             Add(k, sec[k]);
                     }
                 }
-
-                if (saveLater)
-                {
-                    Save();
-                }
             }
-
             Dirty = false;
         }
 
