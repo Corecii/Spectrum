@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-namespace Spectrum.API.Experimental
+namespace Spectrum.API.Storage
 {
     public class Assets
     {

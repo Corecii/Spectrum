@@ -22,9 +22,7 @@ namespace Spectrum.API.Storage
             RootDirectory = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
 
             if (!Directory.Exists(DirectoryPath))
-            {
                 Directory.CreateDirectory(DirectoryPath);
-            }
         }
 
         public string CreateFile(string fileName, bool overwrite = false)

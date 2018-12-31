@@ -9,7 +9,8 @@ namespace Spectrum.API.Input
         private List<string> Keys { get; }
         private bool WasFired { get; set; }
         private bool IsOneTime { get; } = true;
-        public int Specificity { get { return Keys.Count; } }
+
+        public int Specificity => Keys.Count;
 
         public bool IsPressed
         {
@@ -23,6 +24,7 @@ namespace Spectrum.API.Input
                         pressed = true;
                         continue;
                     }
+
                     pressed = false;
                     WasFired = false;
                     break;
@@ -70,9 +72,7 @@ namespace Spectrum.API.Input
                     var split = hotkey.Split('+');
 
                     foreach (var s in split)
-                    {
                         list.Add(s);
-                    }
                 }
                 else
                 {
@@ -89,9 +89,8 @@ namespace Spectrum.API.Input
             var sb = new StringBuilder();
 
             foreach (var s in Keys)
-            {
                 sb.Append($"{s}+");
-            }
+
             return sb.ToString().Trim('+');
         }
     }
