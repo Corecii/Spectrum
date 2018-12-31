@@ -29,7 +29,7 @@ namespace Spectrum.Manager.Runtime
             {
                 WriteToConsole = Global.Settings.GetItem<bool>("LogToConsole")
             };
-            Log.Info("Plugin loader starting up...");
+            Log.Info("Plugin loader has been instantiated.");
         }
 
         public void LoadPlugins()

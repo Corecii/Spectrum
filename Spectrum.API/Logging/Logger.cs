@@ -93,11 +93,16 @@ namespace Spectrum.API.Logging
                 Console.ResetColor();
 
             WriteLine($"   Target site: {e.TargetSite}");
-
             WriteLine("   Stack trace:");
 
             foreach (var s in e.StackTrace.Split(Environment.NewLine.ToCharArray()))
                 WriteLine($"      {s}");
+
+            if (e.InnerException != null)
+            {
+                WriteLine("--- Inner exception below ---");
+                Exception(e.InnerException);
+            }
         }
 
         public void ExceptionSilent(Exception e)
@@ -109,6 +114,12 @@ namespace Spectrum.API.Logging
 
             foreach (var s in e.StackTrace.Split(Environment.NewLine.ToCharArray()))
                 WriteLineSilent($"      {s}");
+
+            if (e.InnerException != null)
+            {
+                WriteLineSilent("--- Inner exception below ---");
+                ExceptionSilent(e.InnerException);
+            }
         }
 
         public void WriteLine(string text)

@@ -22,22 +22,20 @@ namespace Spectrum.Manager
         public event EventHandler<PluginInitializationEventArgs> PluginInitialized;
         public IHotkeyManager Hotkeys { get; set; }
 
-        public bool IsEnabled { get; set; }
+        public bool IsEnabled { get; set; } = true;
         public bool CanLoadPlugins => Directory.Exists(Defaults.ManagerPluginDirectory);
 
         public Manager()
         {
-            Log = new Logger(Defaults.ManagerLogFileName);
-            Log.Info("Manager started.");
-
-            IsEnabled = true;
+            Log = new Logger(Defaults.ManagerLogFileName) { WriteToConsole = true };
+            Log.Info("Spectrum Plugin Manager started.");
 
             CheckPaths();
             InitializeSettings();
 
             if (!Global.Settings.GetItem<bool>("Enabled"))
             {
-                Log.Error("Spectrum is disabled. Set 'Enabled' entry to 'true' in settings to restore extension framework functionality.");
+                Log.Error("Spectrum is disabled. Set 'Enabled' entry to 'true' in settings to activate plugin functionality.");
                 IsEnabled = false;
 
                 return;
@@ -52,11 +50,12 @@ namespace Spectrum.Manager
         public void SendIPC(string ipcIdentifierTo, IPCData data)
         {
             var pluginHost = PluginRegistry.GetByIPCIdentifier(ipcIdentifierTo);
+
             if (pluginHost != null)
             {
                 if (!pluginHost.IsIPCEnabled)
                 {
-                    Log.Error($"Plugin with IPC ID {data.SourceIdentifier} tried to send IPCData to {ipcIdentifierTo}, but the target is not IPC enabled.");
+                    Log.Error($"Plugin with IPC ID '{data.SourceIdentifier}' tried to send IPCData to '{ipcIdentifierTo}', but the target is not IPC enabled.");
                     return;
                 }
 
@@ -93,6 +92,8 @@ namespace Spectrum.Manager
             }
             catch (Exception ex)
             {
+                Log.Error("Manager exception occured while a plugin tried to get manager's configuration entry. Check the log file for details.");
+
                 Log.ExceptionSilent(ex);
                 return default(T);
             }
@@ -130,11 +131,8 @@ namespace Spectrum.Manager
             {
                 foreach (var pluginInfo in PluginRegistry)
                 {
-                    if (pluginInfo.Enabled && pluginInfo.UpdatesEveryFrame)
-                    {
-                        var plugin = pluginInfo.Instance as IUpdatable;
-                        plugin?.Update();
-                    }
+                    if (pluginInfo.Enabled && pluginInfo.UpdatesEveryFrame && pluginInfo.Instance is IUpdatable plugin)
+                        plugin.Update();
                 }
             }
         }
@@ -168,7 +166,7 @@ namespace Spectrum.Manager
 
         private void StartExtensions()
         {
-            Log.Info("Initializing extensions");
+            Log.Info("Initializing extensions...");
 
             for (var i = 0; i < PluginRegistry.Count; i++)
             {
@@ -186,7 +184,8 @@ namespace Spectrum.Manager
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"Plugin {pluginHost.Manifest.FriendlyName} failed to initialize. Exception below.\n{ex}");
+                    Log.Error($"Plugin {pluginHost.Manifest.FriendlyName} failed to initialize. Exception has been caught, see the log for details.");
+                    Log.ExceptionSilent(ex);
                 }
             }
 
