@@ -166,7 +166,7 @@ namespace Spectrum.Manager.Runtime
             }
             catch (ReflectionTypeLoadException rtle)
             {
-                Log.Error($"Couldn't import types of assembly {manifest.ModuleFileName}. The plugin was built for an older Spectrum.API module.");
+                Log.Error($"Couldn't import types of assembly {manifest.ModuleFileName}. The plugin was probably built for an older Spectrum.API module. See the Plugin Loader log file for details.");
                 Log.ExceptionSilent(rtle);
 
                 return;
