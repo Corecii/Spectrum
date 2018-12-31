@@ -166,6 +166,12 @@ namespace Spectrum.Manager
 
         private void StartExtensions()
         {
+            if (PluginRegistry == null || PluginRegistry.Count == 0)
+            {
+                Log.Info("No plugins loaded, skipping initalization.");
+                return;
+            }
+
             Log.Info("Initializing extensions...");
 
             for (var i = 0; i < PluginRegistry.Count; i++)
@@ -189,7 +195,7 @@ namespace Spectrum.Manager
                 }
             }
 
-            Log.Info("Extensions initialized");
+            Log.Info("Extensions initialized.");
         }
     }
 }
