@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Spectrum.API.Logging;
 
@@ -23,6 +25,23 @@ namespace Spectrum.API.Storage
 
             if (!Directory.Exists(DirectoryPath))
                 Directory.CreateDirectory(DirectoryPath);
+        }
+
+        public bool FileExists(string path)
+        {
+            var targetFilePath = Path.Combine(DirectoryPath, path);
+            return File.Exists(targetFilePath);
+        }
+
+        public bool DirectoryExists(string path)
+        {
+            var targetDirectoryPath = Path.Combine(DirectoryPath, path);
+            return Directory.Exists(targetDirectoryPath);
+        }
+
+        public bool PathExists(string path)
+        {
+            return FileExists(path) || DirectoryExists(path);
         }
 
         public string CreateFile(string fileName, bool overwrite = false)
@@ -74,6 +93,59 @@ namespace Spectrum.API.Storage
                 Log.Error($"Couldn't delete a PluginData file for path '{targetFilePath}'.");
                 Log.Exception(ex);
             }
+        }
+
+        public void IterateOver(string directoryPath, Action<string> action)
+        {
+            var targetDirectoryPath = Path.Combine(DirectoryPath, directoryPath);
+
+            if (!Directory.Exists(targetDirectoryPath))
+            {
+                Log.Error($"Cannot iterate over directory at '{targetDirectoryPath}'. It doesn't exist.");
+                return;
+            }
+
+            var paths = Directory.GetFiles(targetDirectoryPath);
+            foreach (var path in paths)
+            {
+                try
+                {
+                    action(path);
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Action for the file '{path}' failed. See file system exception log for details.");
+                    Log.ExceptionSilent(e);
+
+                    return;
+                }
+            }
+        }
+
+        public List<string> GetDirectories(string directoryPath)
+        {
+            var targetDirectoryPath = Path.Combine(DirectoryPath, directoryPath);
+
+            if (!Directory.Exists(targetDirectoryPath))
+            {
+                Log.Error($"Cannot get files in directory at '{targetDirectoryPath}'. It doesn't exist.");
+                return null;
+            }
+
+            return Directory.GetDirectories(targetDirectoryPath).ToList();
+        }
+
+        public List<string> GetFiles(string directoryPath)
+        {
+            var targetDirectoryPath = Path.Combine(DirectoryPath, directoryPath);
+
+            if (!Directory.Exists(targetDirectoryPath))
+            {
+                Log.Error($"Cannot get files in directory at '{targetDirectoryPath}'. It doesn't exist.");
+                return null;
+            }
+
+            return Directory.GetFiles(targetDirectoryPath).ToList();
         }
 
         public FileStream OpenFile(string fileName, FileMode fileMode, FileAccess fileAccess, FileShare fileShare)
