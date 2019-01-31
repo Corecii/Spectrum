@@ -13,7 +13,7 @@ namespace Spectrum.Resonator.Providers
 
         public void Reset()
         {
-            Messenger.Default.Send(new SetStatusBarActionMessage { Action = null });
+            SetActionInfo(null);
         }
     }
 }

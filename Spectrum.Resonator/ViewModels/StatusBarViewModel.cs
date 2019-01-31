@@ -9,10 +9,7 @@ namespace Spectrum.Resonator.ViewModels
 
         public StatusBarViewModel()
         {
-            Messenger.Default.Register<SetStatusBarActionMessage>(this, (msg) =>
-            {
-                ActionInfo = msg.Action;
-            });
+            Messenger.Default.Register<SetStatusBarActionMessage>(this, (msg) => ActionInfo = msg.Action);
         }
     }
 }

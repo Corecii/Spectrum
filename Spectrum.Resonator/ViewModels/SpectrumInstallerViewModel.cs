@@ -43,7 +43,7 @@ namespace Spectrum.Resonator.ViewModels
         [Command]
         public async void DownloadAvailableReleases()
         {
-            _statusBarDataProvider.SetActionInfo("Downloading...");
+            _statusBarDataProvider.SetActionInfo("Downloading release list...");
 
             AvailableReleases = await _spectrumInstallerService.DownloadReleaseList();
 
@@ -54,7 +54,7 @@ namespace Spectrum.Resonator.ViewModels
         }
 
         [Command]
-        public void OpenBrowseDialog(Window owner)
+        public void BrowseForDistanceInstallation(Window owner)
         {
             var commonFileDialog = new CommonOpenFileDialog
             {

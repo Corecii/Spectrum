@@ -39,7 +39,7 @@
                           Margin="0"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Top"
-                          Command="{Binding OpenBrowseDialogCommand}"
+                          Command="{Binding BrowseForDistanceInstallationCommand}"
                           CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type atlas:Window}}}"
                           Content="Browse" />
         </Grid>
