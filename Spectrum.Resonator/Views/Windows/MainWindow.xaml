@@ -3,25 +3,23 @@
               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
               xmlns:atlas="clr-namespace:Atlas.UI;assembly=Atlas.UI"
               xmlns:vm="clr-namespace:Spectrum.Resonator.ViewModels"
-              Title="MainWindow"
-              Width="800"
-              Height="450"
+              xmlns:mx="clr-namespace:Spectrum.Resonator.Infrastructure.MarkupExtensions"
+              DataContext="{mx:DataContextSource vm:MainWindowViewModel}"
+              Title="Spectrum Resonator"
+              Width="600"
+              Height="300"
+              CaptionTitleAlignment="Left"
               Background="#2D2D30"
               CanMaximize="False"
               ShowMaximizeButton="False"
               ShowShadeButton="False">
-    <atlas:Window.DataContext>
-        <vm:MainWindowViewModel />
-    </atlas:Window.DataContext>
-
-    <Grid>
-        <TextBlock HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Text="{Binding TestBindableString}" />
-
-        <atlas:Button HorizontalAlignment="Left"
-                      VerticalAlignment="Top"
-                      Command="{Binding ClickityClickCommand}"
-                      Content="Click!" />
-    </Grid>
+    <atlas:TabControl>
+        <atlas:TabItem Header="Spectrum Installer">
+            <atlas:Button Content="Test"
+                          Command="{Binding TestCommand}" />
+        </atlas:TabItem>
+        <atlas:TabItem Header="Spectrum Configuration" />
+        <atlas:TabItem Header="Plugin Manager" />
+        <atlas:TabItem Header="Plugin Configurator" />
+    </atlas:TabControl>
 </atlas:Window>

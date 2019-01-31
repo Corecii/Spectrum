@@ -1,17 +1,26 @@
 ﻿using DevExpress.Mvvm;
 using DevExpress.Mvvm.DataAnnotations;
-using System.Windows;
+using Spectrum.Resonator.Services.Interfaces;
+using System.Diagnostics;
 
 namespace Spectrum.Resonator.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public string TestBindableString { get; set; } = "This is a test.";
+        private readonly ISpectrumInstallerService _spectrumInstallerService;
+
+        public MainWindowViewModel(ISpectrumInstallerService spectrumInstallerService)
+        {
+            _spectrumInstallerService = spectrumInstallerService;
+        }
 
         [Command]
-        public void ClickityClick()
+        public async void Test()
         {
-            MessageBox.Show("Yay.");
+            var releases = await _spectrumInstallerService.GetReleaseList();
+
+            foreach(var release in releases)
+                Debug.WriteLine(release.Url);
         }
     }
 }
