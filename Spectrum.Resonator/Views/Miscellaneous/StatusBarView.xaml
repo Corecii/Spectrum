@@ -9,17 +9,17 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-
+    
         <TextBlock Grid.Column="0"
                    Margin="4,0,10,0"
-                   VerticalAlignment="Center"
                    HorizontalAlignment="Left"
-                   Text="{Binding ActionInfo, FallbackValue='Idle'}" />
+                   VerticalAlignment="Center"
+                   Text="{Binding ActionInfo, TargetNullValue='Idle', UpdateSourceTrigger=PropertyChanged}" />
 
         <TextBlock Grid.Column="1"
                    Margin="10,0,4,0"
-                   VerticalAlignment="Center"
                    HorizontalAlignment="Right"
-                   Text="{Binding DetailedStatus, FallbackValue='Not doing anything'}" />
+                   VerticalAlignment="Center"
+                   Text="{Binding DetailedStatus, TargetNullValue='Waiting for user input...', UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 </UserControl>

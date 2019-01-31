@@ -1,4 +1,5 @@
-﻿using Spectrum.Resonator.Infrastructure;
+﻿using PropertyChanged;
+using Spectrum.Resonator.Infrastructure;
 using Spectrum.Resonator.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ using System.Windows.Shapes;
 
 namespace Spectrum.Resonator.Views.Windows
 {
+    [DoNotNotify]
     public partial class MainWindow
     {
         public MainWindow()

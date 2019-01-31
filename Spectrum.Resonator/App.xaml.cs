@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using DevExpress.Mvvm;
 using Spectrum.Resonator.Infrastructure;
 using Spectrum.Resonator.Infrastructure.Modules;
 using System.Windows;
@@ -13,6 +14,8 @@ namespace Spectrum.Resonator
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            Messenger.Default = new Messenger(true);
 
             ContainerBuilder = new ContainerBuilder();
             ContainerBuilder.RegisterModule<ViewModelModule>();
