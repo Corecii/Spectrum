@@ -39,7 +39,7 @@ namespace Spectrum.Resonator.Services
             throw new NotImplementedException();
         }
 
-        public async Task<List<Release>> GetReleaseList()
+        public async Task<List<Release>> DownloadReleaseList()
         {
             return new List<Release>(await GitHubClient.Repository.Release.GetAll("Ciastex", "Spectrum"));
         }

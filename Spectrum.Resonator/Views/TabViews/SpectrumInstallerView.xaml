@@ -4,6 +4,42 @@
              xmlns:local="clr-namespace:Spectrum.Resonator.Views.TabViews"
              xmlns:mx="clr-namespace:Spectrum.Resonator.Infrastructure.MarkupExtensions"
              xmlns:vm="clr-namespace:Spectrum.Resonator.ViewModels"
+             xmlns:atlas="clr-namespace:Atlas.UI;assembly=Atlas.UI"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignWidth="400"
+             d:DesignHeight="300"
              DataContext="{mx:DataContextSource vm:SpectrumInstallerViewModel}">
-    <Grid />
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <atlas:ComboBox ItemsSource="{Binding AvailableReleases, UpdateSourceTrigger=PropertyChanged}" 
+                        SelectedItem="{Binding PickedRelease, UpdateSourceTrigger=PropertyChanged}"
+                        Margin="4" 
+                        HorizontalAlignment="Stretch" 
+                        VerticalAlignment="Top" 
+                        Height="24">
+            <atlas:ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Margin="4,0"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="{Binding TagName}" />
+                </DataTemplate>
+            </atlas:ComboBox.ItemTemplate>
+        </atlas:ComboBox>
+
+
+        <atlas:Button Content="Refresh"
+                      Command="{Binding DownloadAvailableReleasesCommand}" 
+                      Grid.Column="1"
+                      Padding="0"
+                      Height="24"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Top"/>
+    </Grid>
 </UserControl>

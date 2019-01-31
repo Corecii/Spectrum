@@ -12,7 +12,7 @@ namespace Spectrum.Resonator.Services.Interfaces
 
         DistanceInstallationInfo GetDistanceInstallationStatus();
 
-        Task<List<Release>> GetReleaseList();
+        Task<List<Release>> DownloadReleaseList();
         Task DownloadPackage(string assetUrl, string targetPath);
         Task InstallPackage(string sourcePath);
     }

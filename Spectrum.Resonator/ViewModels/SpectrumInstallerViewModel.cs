@@ -1,6 +1,10 @@
 ﻿using DevExpress.Mvvm;
+using DevExpress.Mvvm.DataAnnotations;
+using Octokit;
 using Spectrum.Resonator.Models;
 using Spectrum.Resonator.Services.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Spectrum.Resonator.ViewModels
 {
@@ -20,9 +24,30 @@ namespace Spectrum.Resonator.ViewModels
             }
         }
 
+        public List<Release> AvailableReleases
+        {
+            get => GetProperty(() => AvailableReleases);
+            set => SetProperty(() => AvailableReleases, value);
+        }
+
+        public Release PickedRelease
+        {
+            get => GetProperty(() => PickedRelease);
+            set => SetProperty(() => PickedRelease, value);
+        }
+
         public SpectrumInstallerViewModel(ISpectrumInstallerService spectrumInstallerService)
         {
             _spectrumInstallerService = spectrumInstallerService;
+        }
+
+        [Command]
+        public async void DownloadAvailableReleases()
+        {
+            AvailableReleases = await _spectrumInstallerService.DownloadReleaseList();
+
+            if (AvailableReleases.Count > 0)
+                PickedRelease = AvailableReleases.First();
         }
     }
 }

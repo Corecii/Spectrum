@@ -17,6 +17,7 @@ namespace Spectrum.Resonator
             ContainerBuilder = new ContainerBuilder();
             ContainerBuilder.RegisterModule<ViewModelModule>();
             ContainerBuilder.RegisterModule<ServiceModule>();
+            ContainerBuilder.RegisterModule<ProviderModule>();
 
             Container = ContainerBuilder.Build();
 

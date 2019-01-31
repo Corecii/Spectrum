@@ -4,6 +4,8 @@
               xmlns:atlas="clr-namespace:Atlas.UI;assembly=Atlas.UI"
               xmlns:mx="clr-namespace:Spectrum.Resonator.Infrastructure.MarkupExtensions"
               xmlns:vm="clr-namespace:Spectrum.Resonator.ViewModels"
+              xmlns:miscellaneous="clr-namespace:Spectrum.Resonator.Views.Miscellaneous"
+              xmlns:tabviews="clr-namespace:Spectrum.Resonator.Views.TabViews"
               Title="Spectrum Resonator"
               Width="600"
               Height="300"
@@ -20,11 +22,14 @@
 
         <atlas:TabControl Grid.Row="0">
             <atlas:TabItem Header="Spectrum Installer">
-                <TextBlock Text="{Binding DistanceInstallationInfo.InstallationPath}" />
+                <tabviews:SpectrumInstallerView />
             </atlas:TabItem>
+            
             <atlas:TabItem Header="Spectrum Configuration" />
             <atlas:TabItem Header="Plugin Manager" />
             <atlas:TabItem Header="Plugin Configurator" />
         </atlas:TabControl>
+
+        <miscellaneous:StatusBarView Grid.Row="1" />
     </Grid>
 </atlas:Window>

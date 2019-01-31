@@ -26,7 +26,7 @@ namespace Spectrum.Resonator.Infrastructure
 
         public object Resolve(Type t)
         {
-            return _container.Resolve(t);
+            return _container.Resolve(t) ?? new object();
         }
     }
 }
