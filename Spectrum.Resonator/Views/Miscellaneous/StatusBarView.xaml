@@ -5,21 +5,9 @@
              xmlns:vm="clr-namespace:Spectrum.Resonator.ViewModels"
              DataContext="{mx:DataContextSource vm:StatusBarViewModel}">
     <Grid Background="#007ACC">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
-        <TextBlock Grid.Column="0"
-                   Margin="4,0,10,0"
+        <TextBlock Margin="4,0,10,0"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Center"
                    Text="{Binding ActionInfo, TargetNullValue='Idle', UpdateSourceTrigger=PropertyChanged}" />
-
-        <TextBlock Grid.Column="1"
-                   Margin="10,0,4,0"
-                   HorizontalAlignment="Right"
-                   VerticalAlignment="Center"
-                   Text="{Binding DetailedStatus, TargetNullValue='Waiting for user input...', UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 </UserControl>

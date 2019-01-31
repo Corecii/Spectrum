@@ -1,11 +1,13 @@
 ﻿using DevExpress.Mvvm;
 using DevExpress.Mvvm.DataAnnotations;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using Octokit;
 using Spectrum.Resonator.Models;
 using Spectrum.Resonator.Providers.Interfaces;
 using Spectrum.Resonator.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 
 namespace Spectrum.Resonator.ViewModels
 {
@@ -14,19 +16,8 @@ namespace Spectrum.Resonator.ViewModels
         private readonly ISpectrumInstallerService _spectrumInstallerService;
         private readonly IStatusBarDataProvider _statusBarDataProvider;
 
-        private DistanceInstallationInfo _distanceInstallationInfo;
 
-        public DistanceInstallationInfo DistanceInstallationInfo
-        {
-            get
-            {
-                var steamVersionInstallationInfo = _spectrumInstallerService.GetDistanceInstallationStatus();
-                _distanceInstallationInfo = steamVersionInstallationInfo ?? (_distanceInstallationInfo = new DistanceInstallationInfo());
-
-                return _distanceInstallationInfo;
-            }
-        }
-
+        public DistanceInstallationInfo DistanceInstallationInfo { get; set; }
         public List<Release> AvailableReleases { get; set; }
         public Release PickedRelease { get; set; }
 
@@ -45,6 +36,7 @@ namespace Spectrum.Resonator.ViewModels
             _spectrumInstallerService = spectrumInstallerService;
             _statusBarDataProvider = statusBarDataProvider;
 
+            DistanceInstallationInfo = _spectrumInstallerService.GetDistanceInstallationStatus();
             DownloadAvailableReleases();
         }
 
@@ -52,7 +44,6 @@ namespace Spectrum.Resonator.ViewModels
         public async void DownloadAvailableReleases()
         {
             _statusBarDataProvider.SetActionInfo("Downloading...");
-            _statusBarDataProvider.SetDetailedStatus("Getting release list");
 
             AvailableReleases = await _spectrumInstallerService.DownloadReleaseList();
 
@@ -60,6 +51,31 @@ namespace Spectrum.Resonator.ViewModels
                 PickedRelease = AvailableReleases.First();
 
             _statusBarDataProvider.Reset();
+        }
+
+        [Command]
+        public void OpenBrowseDialog(Window owner)
+        {
+            var commonFileDialog = new CommonOpenFileDialog
+            {
+                Title = "Browse for Distance installation...",
+                IsFolderPicker = true,
+                Multiselect = false,
+                ShowPlacesList = false,
+                AllowNonFileSystemItems = false,
+                EnsurePathExists = true
+            };
+
+            var result = commonFileDialog.ShowDialog(owner);
+
+            if (result == CommonFileDialogResult.Ok)
+            {
+                DistanceInstallationInfo = new DistanceInstallationInfo
+                {
+                    InstallationPath = commonFileDialog.FileName,
+                    IsInstalled = true
+                };
+            }
         }
     }
 }

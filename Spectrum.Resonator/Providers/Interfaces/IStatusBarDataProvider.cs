@@ -5,7 +5,6 @@ namespace Spectrum.Resonator.Providers.Interfaces
     public interface IStatusBarDataProvider : IProvider
     {
         void SetActionInfo(string newActionInfo);
-        void SetDetailedStatus(string newDetailedStatus);
         void Reset();
     }
 }

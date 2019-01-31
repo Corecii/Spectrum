@@ -39,7 +39,8 @@
                           Margin="0"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Top"
-                          Command="{Binding DownloadAvailableReleasesCommand}"
+                          Command="{Binding OpenBrowseDialogCommand}"
+                          CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type atlas:Window}}}"
                           Content="Browse" />
         </Grid>
 
@@ -85,7 +86,6 @@
                           Command="{Binding DownloadAvailableReleasesCommand}"
                           Content="Refresh" />
         </Grid>
-
 
         <atlas:CheckBox x:Name="LatestReleaseCheckBox"
                         Grid.Row="2"
