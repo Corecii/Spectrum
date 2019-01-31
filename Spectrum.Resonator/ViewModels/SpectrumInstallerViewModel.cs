@@ -30,10 +30,22 @@ namespace Spectrum.Resonator.ViewModels
         public List<Release> AvailableReleases { get; set; }
         public Release PickedRelease { get; set; }
 
+        public bool GetLatestRelease
+        {
+            get => GetProperty(() => GetLatestRelease);
+            set => SetProperty(() => GetLatestRelease, value, () =>
+            {
+                if (value)
+                    PickedRelease = AvailableReleases.OrderByDescending(x => x.CreatedAt).First();
+            });
+        }
+
         public SpectrumInstallerViewModel(ISpectrumInstallerService spectrumInstallerService, IStatusBarDataProvider statusBarDataProvider)
         {
             _spectrumInstallerService = spectrumInstallerService;
             _statusBarDataProvider = statusBarDataProvider;
+
+            DownloadAvailableReleases();
         }
 
         [Command]

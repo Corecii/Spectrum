@@ -9,7 +9,7 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-    
+
         <TextBlock Grid.Column="0"
                    Margin="4,0,10,0"
                    HorizontalAlignment="Left"
