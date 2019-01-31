@@ -79,6 +79,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Views\Miscellaneous\StatusBarView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TabViews\SpectrumInstallerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Windows\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -87,14 +95,27 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Infrastructure\Markers\Interfaces\IProvider.cs" />
     <Compile Include="Infrastructure\Markers\Interfaces\IService.cs" />
     <Compile Include="Infrastructure\MarkupExtensions\DataContextSource.cs" />
+    <Compile Include="Infrastructure\Modules\ProviderModule.cs" />
     <Compile Include="Infrastructure\Modules\ServiceModule.cs" />
     <Compile Include="Infrastructure\Modules\ViewModelModule.cs" />
     <Compile Include="Infrastructure\Resolver.cs" />
+    <Compile Include="Models\DistanceInstallationInfo.cs" />
+    <Compile Include="Models\StatusBarData.cs" />
+    <Compile Include="Providers\Interfaces\IStatusBarDataProvider.cs" />
+    <Compile Include="Providers\StatusBarDataProvider.cs" />
     <Compile Include="Services\Interfaces\ISpectrumInstallerService.cs" />
     <Compile Include="Services\SpectrumInstallerService.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\SpectrumInstallerViewModel.cs" />
+    <Compile Include="Views\Miscellaneous\StatusBarView.xaml.cs">
+      <DependentUpon>StatusBarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TabViews\SpectrumInstallerView.xaml.cs">
+      <DependentUpon>SpectrumInstallerView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

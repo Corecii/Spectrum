@@ -7,6 +7,7 @@ namespace Spectrum.Resonator.Infrastructure.MarkupExtensions
     [MarkupExtensionReturnType(typeof(ViewModelBase))]
     public class DataContextSource : MarkupExtension
     {
+        [ConstructorArgument("viewModelType")]
         public Type ViewModelType { get; set; }
 
         public DataContextSource(Type viewModelType)

@@ -1,5 +1,6 @@
 ﻿using Octokit;
 using Spectrum.Resonator.Infrastructure.Markers.Interfaces;
+using Spectrum.Resonator.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,8 +10,10 @@ namespace Spectrum.Resonator.Services.Interfaces
     {
         bool IsSpectrumInstalled { get; }
 
+        DistanceInstallationInfo GetDistanceInstallationStatus();
+
         Task<List<Release>> GetReleaseList();
-        Task DownloadPackage(string releaseName, string targetPath);
+        Task DownloadPackage(string assetUrl, string targetPath);
         Task InstallPackage(string sourcePath);
     }
 }
