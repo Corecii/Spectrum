@@ -1,6 +1,5 @@
 ﻿using DevExpress.Mvvm;
 using DevExpress.Mvvm.DataAnnotations;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using Octokit;
 using Spectrum.Resonator.Models;
 using Spectrum.Resonator.Providers.Interfaces;
@@ -14,12 +13,14 @@ namespace Spectrum.Resonator.ViewModels
     public class SpectrumInstallerViewModel : ViewModelBase
     {
         private readonly ISpectrumInstallerService _spectrumInstallerService;
+        private readonly IBrowseDialogService _browseDialogService;
         private readonly IStatusBarDataProvider _statusBarDataProvider;
 
-
-        public DistanceInstallationInfo DistanceInstallationInfo { get; set; }
         public List<Release> AvailableReleases { get; set; }
         public Release PickedRelease { get; set; }
+        public bool InstallLocalPackage { get; set; }
+        public string DistanceInstallationPath { get; set; }
+        public string LocalPackagePath { get; set; }
 
         public bool GetLatestRelease
         {
@@ -31,12 +32,30 @@ namespace Spectrum.Resonator.ViewModels
             });
         }
 
-        public SpectrumInstallerViewModel(ISpectrumInstallerService spectrumInstallerService, IStatusBarDataProvider statusBarDataProvider)
+        public bool IsInstallationPossible
+        {
+            get
+            {
+                var distanceIsInstalled = _spectrumInstallerService.ValidateDistanceInstallationPath(DistanceInstallationPath);
+                var packageIsValid = false;
+
+                if (InstallLocalPackage)
+                    packageIsValid = _spectrumInstallerService.ValidateSpectrumPackage(LocalPackagePath);
+
+                return distanceIsInstalled && packageIsValid;
+            }
+        }
+
+        public SpectrumInstallerViewModel(ISpectrumInstallerService spectrumInstallerService,
+                                          IBrowseDialogService browseDialogService,
+                                          IStatusBarDataProvider statusBarDataProvider)
         {
             _spectrumInstallerService = spectrumInstallerService;
+            _browseDialogService = browseDialogService;
             _statusBarDataProvider = statusBarDataProvider;
 
-            DistanceInstallationInfo = _spectrumInstallerService.GetDistanceInstallationStatus();
+            DistanceInstallationPath = _spectrumInstallerService.GetRegisteredDistanceInstallationPath();
+
             DownloadAvailableReleases();
         }
 
@@ -56,26 +75,45 @@ namespace Spectrum.Resonator.ViewModels
         [Command]
         public void BrowseForDistanceInstallation(Window owner)
         {
-            var commonFileDialog = new CommonOpenFileDialog
+            var path = _browseDialogService.Browse(new BrowseDialogSettings
             {
-                Title = "Browse for Distance installation...",
+                Owner = owner,
                 IsFolderPicker = true,
-                Multiselect = false,
-                ShowPlacesList = false,
-                AllowNonFileSystemItems = false,
-                EnsurePathExists = true
-            };
+                Title = "Browse for Distance installation directory..."
+            });
 
-            var result = commonFileDialog.ShowDialog(owner);
+            if (!string.IsNullOrWhiteSpace(path))
+                DistanceInstallationPath = path;
+        }
 
-            if (result == CommonFileDialogResult.Ok)
+        [Command]
+        public void BrowseForLocalPackage(Window owner)
+        {
+            var path = _browseDialogService.Browse(new BrowseDialogSettings
             {
-                DistanceInstallationInfo = new DistanceInstallationInfo
-                {
-                    InstallationPath = commonFileDialog.FileName,
-                    IsInstalled = true
-                };
+                Owner = owner,
+                IsFolderPicker = false,
+                Title = "Browse for local Spectrum package..."
+            });
+
+            if (!string.IsNullOrWhiteSpace(path))
+                LocalPackagePath = path;
+        }
+
+        [Command]
+        public async void BeginInstallation(Window owner)
+        {
+            if (InstallLocalPackage)
+            {
+                _statusBarDataProvider.SetActionInfo("Installing local package...");
+                await _spectrumInstallerService.InstallPackage(LocalPackagePath);
             }
+            else
+            {
+                // download, unpack, install
+            }
+
+            _statusBarDataProvider.Reset();
         }
     }
 }

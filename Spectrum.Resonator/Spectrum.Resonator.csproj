@@ -73,6 +73,11 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.IO.Compression.ZipFile, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Compression.ZipFile.4.3.0\lib\net46\System.IO.Compression.ZipFile.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Expression.Blend.Sdk.WPF.1.0.1\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -118,9 +123,11 @@
     <Compile Include="Infrastructure\Modules\ServiceModule.cs" />
     <Compile Include="Infrastructure\Modules\ViewModelModule.cs" />
     <Compile Include="Infrastructure\Resolver.cs" />
-    <Compile Include="Models\DistanceInstallationInfo.cs" />
+    <Compile Include="Models\BrowseDialogSettings.cs" />
     <Compile Include="Providers\Interfaces\IStatusBarDataProvider.cs" />
     <Compile Include="Providers\StatusBarDataProvider.cs" />
+    <Compile Include="Services\BrowseDialogService.cs" />
+    <Compile Include="Services\Interfaces\IBrowseDialogService.cs" />
     <Compile Include="Services\Interfaces\ISpectrumInstallerService.cs" />
     <Compile Include="Services\SpectrumInstallerService.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />

@@ -14,6 +14,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="26" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
@@ -37,11 +38,9 @@
             <atlas:TextBox Grid.Row="1"
                            Height="26"
                            Margin="0,0,4,0"
-                           Padding="2,4"
-                           Placeholder="Needs Distance directory..."
-                           PlaceholderPadding="2,4"
+                           Placeholder="Provide Distance installation directory..."
                            ShowPlaceholder="True"
-                           Text="{Binding DistanceInstallationInfo.InstallationPath}" />
+                           Text="{Binding DistanceInstallationPath}" />
 
             <atlas:Button Grid.Row="1"
                           Grid.Column="1"
@@ -57,7 +56,7 @@
               Grid.ColumnSpan="2"
               Margin="0,4,0,0"
               IsEnabled="{DXBinding '!@e(LatestReleaseCheckBox).IsChecked'}"
-              Visibility="{DXBinding '!@e(InstallLocalPackageToggle).IsChecked',
+              Visibility="{DXBinding '!InstallLocalPackage',
                                      Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -100,12 +99,52 @@
                           Content="Refresh" />
         </Grid>
 
+        <Grid Grid.Row="1"
+              Grid.ColumnSpan="2"
+              Margin="0,4,0,0"
+              Visibility="{DXBinding 'InstallLocalPackage',
+                                     Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Local Spectrum package path" />
+
+            <atlas:TextBox Grid.Row="1"
+                           Grid.Column="0"
+                           Height="26"
+                           Margin="0,0,4,0"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Top"
+                           Placeholder="Provide Spectrum package path..."
+                           ShowPlaceholder="True"
+                           Text="{Binding LocalPackagePath}" />
+
+            <atlas:Button Grid.Row="1"
+                          Grid.Column="1"
+                          Margin="0"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Top"
+                          Command="{Binding BrowseForLocalPackageCommand}"
+                          CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type atlas:Window}}}"
+                          Content="Browse" />
+        </Grid>
+
         <atlas:CheckBox x:Name="LatestReleaseCheckBox"
                         Grid.Row="2"
                         Grid.Column="0"
                         Margin="0,4,0,0"
+                        Padding="4,0,0,0"
                         Content="Get latest release"
-                        IsChecked="{Binding GetLatestRelease}" />
+                        IsChecked="{Binding GetLatestRelease}"
+                        Visibility="{DXBinding '!InstallLocalPackage',
+                                               Converter={StaticResource BooleanToVisibilityConverter}}" />
 
         <atlas:Toggle x:Name="InstallLocalPackageToggle"
                       Grid.Row="2"
@@ -113,8 +152,16 @@
                       Margin="0,4,0,0"
                       HorizontalContentAlignment="Right"
                       Content="Install local package"
-                      IsChecked="False"
+                      IsChecked="{Binding InstallLocalPackage}"
                       ToggledStateText="YES"
                       UntoggledStateText="NO" />
+
+        <atlas:Button Grid.Row="3"
+                      Grid.ColumnSpan="2"
+                      Margin="0,12,0,0"
+                      HorizontalAlignment="Right"
+                      Command="{Binding BeginInstallationCommand}"
+                      Content="Begin installation"
+                      IsEnabled="{Binding IsInstallationPossible}" />
     </Grid>
 </UserControl>
