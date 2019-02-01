@@ -6,6 +6,10 @@
              xmlns:mx="clr-namespace:Spectrum.Resonator.Infrastructure.MarkupExtensions"
              xmlns:vm="clr-namespace:Spectrum.Resonator.ViewModels"
              DataContext="{mx:DataContextSource vm:SpectrumInstallerViewModel}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
+
     <Grid Margin="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -13,7 +17,12 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Row="0" Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -45,8 +54,11 @@
         </Grid>
 
         <Grid Grid.Row="1"
+              Grid.ColumnSpan="2"
               Margin="0,4,0,0"
-              IsEnabled="{DXBinding '!@e(LatestReleaseCheckBox).IsChecked'}">
+              IsEnabled="{DXBinding '!@e(LatestReleaseCheckBox).IsChecked'}"
+              Visibility="{DXBinding '!@e(InstallLocalPackageToggle).IsChecked',
+                                     Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -60,6 +72,7 @@
             <TextBlock Text="Spectrum release" />
 
             <atlas:ComboBox Grid.Row="1"
+                            Grid.Column="0"
                             Height="26"
                             Margin="0,0,4,0"
                             HorizontalAlignment="Stretch"
@@ -89,8 +102,19 @@
 
         <atlas:CheckBox x:Name="LatestReleaseCheckBox"
                         Grid.Row="2"
+                        Grid.Column="0"
                         Margin="0,4,0,0"
                         Content="Get latest release"
                         IsChecked="{Binding GetLatestRelease}" />
+
+        <atlas:Toggle x:Name="InstallLocalPackageToggle"
+                      Grid.Row="2"
+                      Grid.Column="1"
+                      Margin="0,4,0,0"
+                      HorizontalContentAlignment="Right"
+                      Content="Install local package"
+                      IsChecked="False"
+                      ToggledStateText="YES"
+                      UntoggledStateText="NO" />
     </Grid>
 </UserControl>
