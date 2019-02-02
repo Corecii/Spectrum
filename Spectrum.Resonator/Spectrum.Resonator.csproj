@@ -124,12 +124,15 @@
     <Compile Include="Infrastructure\Modules\ViewModelModule.cs" />
     <Compile Include="Infrastructure\Resolver.cs" />
     <Compile Include="Models\BrowseDialogSettings.cs" />
+    <Compile Include="Models\Validator.cs" />
     <Compile Include="Providers\Interfaces\IStatusBarDataProvider.cs" />
     <Compile Include="Providers\StatusBarDataProvider.cs" />
     <Compile Include="Services\BrowseDialogService.cs" />
     <Compile Include="Services\Interfaces\IBrowseDialogService.cs" />
     <Compile Include="Services\Interfaces\ISpectrumInstallerService.cs" />
+    <Compile Include="Services\Interfaces\IValidatorService.cs" />
     <Compile Include="Services\SpectrumInstallerService.cs" />
+    <Compile Include="Services\ValidatorService.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\SpectrumInstallerViewModel.cs" />
     <Compile Include="ViewModels\StatusBarViewModel.cs" />
@@ -166,6 +169,12 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="_validators\DistanceInstallationValidator.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="_validators\SpectrumArchiveValidator.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -12,20 +12,24 @@ namespace Spectrum.Resonator.ViewModels
 {
     public class SpectrumInstallerViewModel : ViewModelBase
     {
-        private readonly ISpectrumInstallerService _spectrumInstallerService;
+        private const string ArchiveValidatorName = "Spectrum Archive Validator";
+        private const string DistanceValidatorName = "Distance Installation Validator";
+
         private readonly IBrowseDialogService _browseDialogService;
+        private readonly ISpectrumInstallerService _spectrumInstallerService;
         private readonly IStatusBarDataProvider _statusBarDataProvider;
+        private readonly IValidatorService _validatorService;
 
         public List<Release> AvailableReleases { get; set; }
         public Release PickedRelease { get; set; }
-        public bool InstallLocalPackage { get; set; }
+        public bool InstallingLocalPackage { get; set; }
         public string DistanceInstallationPath { get; set; }
         public string LocalPackagePath { get; set; }
 
-        public bool GetLatestRelease
+        public bool GettingLatestRelease
         {
-            get => GetProperty(() => GetLatestRelease);
-            set => SetProperty(() => GetLatestRelease, value, () =>
+            get => GetProperty(() => GettingLatestRelease);
+            set => SetProperty(() => GettingLatestRelease, value, () =>
             {
                 if (value)
                     PickedRelease = AvailableReleases.OrderByDescending(x => x.CreatedAt).First();
@@ -36,23 +40,26 @@ namespace Spectrum.Resonator.ViewModels
         {
             get
             {
-                var distanceIsInstalled = _spectrumInstallerService.ValidateDistanceInstallationPath(DistanceInstallationPath);
-                var packageIsValid = false;
+                var distanceIsInstalled = _validatorService.ValidateFileSystemPath(DistanceInstallationPath, DistanceValidatorName);
 
-                if (InstallLocalPackage)
-                    packageIsValid = _spectrumInstallerService.ValidateSpectrumPackage(LocalPackagePath);
-
-                return distanceIsInstalled && packageIsValid;
+                if (InstallingLocalPackage)
+                {
+                    var packageIsValid = _validatorService.ValidateZipArchive(LocalPackagePath, ArchiveValidatorName);
+                    return distanceIsInstalled && packageIsValid;
+                }
+                else return distanceIsInstalled;
             }
         }
 
-        public SpectrumInstallerViewModel(ISpectrumInstallerService spectrumInstallerService,
-                                          IBrowseDialogService browseDialogService,
-                                          IStatusBarDataProvider statusBarDataProvider)
+        public SpectrumInstallerViewModel(IBrowseDialogService browseDialogService, 
+                                          ISpectrumInstallerService spectrumInstallerService,
+                                          IStatusBarDataProvider statusBarDataProvider,
+                                          IValidatorService validatorService)
         {
-            _spectrumInstallerService = spectrumInstallerService;
             _browseDialogService = browseDialogService;
+            _spectrumInstallerService = spectrumInstallerService;
             _statusBarDataProvider = statusBarDataProvider;
+            _validatorService = validatorService;
 
             DistanceInstallationPath = _spectrumInstallerService.GetRegisteredDistanceInstallationPath();
 
@@ -103,14 +110,25 @@ namespace Spectrum.Resonator.ViewModels
         [Command]
         public async void BeginInstallation(Window owner)
         {
-            if (InstallLocalPackage)
+            if (InstallingLocalPackage)
             {
                 _statusBarDataProvider.SetActionInfo("Installing local package...");
-                await _spectrumInstallerService.InstallPackage(LocalPackagePath);
+                await _spectrumInstallerService.InstallPackage(LocalPackagePath, DistanceInstallationPath);
             }
             else
             {
-                // download, unpack, install
+                _statusBarDataProvider.SetActionInfo("Downloading release package...");
+                var packagePath = await _spectrumInstallerService.DownloadPackage(PickedRelease.Assets.First().BrowserDownloadUrl);
+
+                if (_validatorService.ValidateZipArchive(packagePath, ArchiveValidatorName))
+                {
+                    _statusBarDataProvider.SetActionInfo("Installing release package...");
+                    await _spectrumInstallerService.InstallPackage(packagePath, DistanceInstallationPath);
+                }
+                else
+                {
+                    // MessageBox, error, yadda yadda
+                }
             }
 
             _statusBarDataProvider.Reset();

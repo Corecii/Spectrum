@@ -20,7 +20,7 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Row="0" Grid.ColumnSpan="2">
@@ -56,7 +56,7 @@
               Grid.ColumnSpan="2"
               Margin="0,4,0,0"
               IsEnabled="{DXBinding '!@e(LatestReleaseCheckBox).IsChecked'}"
-              Visibility="{DXBinding '!InstallLocalPackage',
+              Visibility="{DXBinding '!InstallingLocalPackage',
                                      Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -102,7 +102,7 @@
         <Grid Grid.Row="1"
               Grid.ColumnSpan="2"
               Margin="0,4,0,0"
-              Visibility="{DXBinding 'InstallLocalPackage',
+              Visibility="{DXBinding 'InstallingLocalPackage',
                                      Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -142,23 +142,22 @@
                         Margin="0,4,0,0"
                         Padding="4,0,0,0"
                         Content="Get latest release"
-                        IsChecked="{Binding GetLatestRelease}"
-                        Visibility="{DXBinding '!InstallLocalPackage',
+                        IsChecked="{Binding GettingLatestRelease}"
+                        Visibility="{DXBinding '!InstallingLocalPackage',
                                                Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-        <atlas:Toggle x:Name="InstallLocalPackageToggle"
-                      Grid.Row="2"
-                      Grid.Column="1"
+        <atlas:Toggle Grid.Row="2"
+                      Grid.ColumnSpan="2"
                       Margin="0,4,0,0"
+                      HorizontalAlignment="Right"
                       HorizontalContentAlignment="Right"
                       Content="Install local package"
-                      IsChecked="{Binding InstallLocalPackage}"
+                      IsChecked="{Binding InstallingLocalPackage}"
                       ToggledStateText="YES"
                       UntoggledStateText="NO" />
 
         <atlas:Button Grid.Row="3"
-                      Grid.ColumnSpan="2"
-                      Margin="0,12,0,0"
+                      Margin="0,8,0,0"
                       HorizontalAlignment="Right"
                       Command="{Binding BeginInstallationCommand}"
                       Content="Begin installation"

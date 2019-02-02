@@ -8,11 +8,10 @@ namespace Spectrum.Resonator.Services.Interfaces
     public interface ISpectrumInstallerService : IService
     {
         Task<List<Release>> DownloadReleaseList();
-        Task DownloadPackage(string assetUrl, string targetPath);
-        Task InstallPackage(string sourcePath);
+        Task<string> DownloadPackage(string assetUrl);
+        Task ExtractPackage(string sourcePath, string distancePath);
+        Task InstallSpectrum(string distancePath);
 
-        bool ValidateDistanceInstallationPath(string path);
-        bool ValidateSpectrumPackage(string path);
         string GetRegisteredDistanceInstallationPath();
     }
 }

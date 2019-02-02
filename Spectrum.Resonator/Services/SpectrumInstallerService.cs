@@ -1,10 +1,10 @@
 ﻿using Microsoft.Win32;
 using Octokit;
 using Spectrum.Resonator.Services.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Spectrum.Resonator.Services
@@ -18,9 +18,14 @@ namespace Spectrum.Resonator.Services
             GitHubClient = new GitHubClient(new ProductHeaderValue("Spectrum.Resonator"));
         }
 
-        public async Task DownloadPackage(string assetUrl, string targetPath)
+        public async Task<string> DownloadPackage(string assetUrl)
         {
-            throw new NotImplementedException();
+            var targetPath = Path.Combine(Path.GetTempPath(), "spectrum.zip");
+
+            using (var webClient = new WebClient())
+                await webClient.DownloadFileTaskAsync(assetUrl, targetPath);
+
+            return targetPath;
         }
 
         public async Task<List<Release>> DownloadReleaseList()
@@ -28,32 +33,18 @@ namespace Spectrum.Resonator.Services
             return new List<Release>(await GitHubClient.Repository.Release.GetAll("Ciastex", "Spectrum"));
         }
 
-        public async Task InstallPackage(string sourcePath)
+        public async Task ExtractPackage(string sourcePath, string distancePath)
         {
-            throw new NotImplementedException();
+            // Only call this when you've validated the package before.
+            // Otherwise bad stuff will happen.
+
+            using (var zipArchive = await Task.Run(() => ZipFile.OpenRead(sourcePath)))
+                await Task.Run(() => zipArchive.ExtractToDirectory(Path.Combine(distancePath, "Distance_Data")));
         }
 
-        public bool ValidateDistanceInstallationPath(string path)
+        public Task InstallSpectrum(string distancePath)
         {
-            return File.Exists(Path.Combine(path, "Distance_Data", "Managed", "Assembly-CSharp.dll"))
-                && File.Exists(Path.Combine(path, "Distance_Data", "Managed", "UnityEngine.dll"))
-                && File.Exists(Path.Combine(path, "Distance.exe"));
-        }
-
-        public bool ValidateSpectrumPackage(string path)
-        {
-            if (!File.Exists(path))
-                return false;
-
-            try
-            {
-                ZipFile.OpenRead(path);
-                return true;
-            }
-            catch (InvalidDataException)
-            {
-                return false;
-            }
+            throw new System.NotImplementedException();
         }
 
         public string GetRegisteredDistanceInstallationPath()
@@ -74,5 +65,7 @@ namespace Spectrum.Resonator.Services
 
             return installationPath;
         }
+
+
     }
 }

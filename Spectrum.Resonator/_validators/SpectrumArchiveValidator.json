@@ -1,0 +1,11 @@
+﻿{
+  "validatorName": "Spectrum Archive Validator",
+  "requiredFiles": [
+    "Managed/install_windows.bat",
+    "Managed/Mono.Cecil.dll",
+    "Managed/Spectrum.Bootstrap.dll",
+    "Managed/Spectrum.Prism.exe",
+    "Spectrum/Spectrum.Manager.dll",
+    "Spectrum/Spectrum.API.dll"
+  ]
+}
