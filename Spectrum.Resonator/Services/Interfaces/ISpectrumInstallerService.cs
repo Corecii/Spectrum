@@ -11,7 +11,7 @@ namespace Spectrum.Resonator.Services.Interfaces
         Task<List<Release>> DownloadReleaseList();
         Task<string> DownloadPackage(string assetUrl);
         Task<PrismTerminationReason> InstallSpectrum(string distancePath, string customPrismArguments = null);
-        Task UninstallSpectrum(string distancePath, bool steamValidate);
+        Task UninstallSpectrum(string distancePath);
 
         string GetRegisteredDistanceInstallationPath();
         void ExtractPackage(string sourcePath, string distancePath);

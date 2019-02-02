@@ -58,33 +58,28 @@ namespace Spectrum.Resonator.Services
             return (PrismTerminationReason)prismProcess.ExitCode;
         }
 
-        public async Task UninstallSpectrum(string distancePath, bool steamValidate)
+        public async Task UninstallSpectrum(string distancePath)
         {
-            // TODO: Don't hardcode paths, preferably use validator service to retrieve some of this.
-            var spectrumPath = Path.Combine(distancePath, "Distance_Data", "Spectrum");
-            var additionalPaths = new List<string>
+            await Task.Run(() =>
             {
-                Path.Combine(distancePath, "Distance_Data", "Managed", "Spectrum.Bootstrap.dll"),
-                Path.Combine(distancePath, "Distance_Data", "Managed", "Spectrum.Prism.exe"),
-                Path.Combine(distancePath, "Distance_Data", "Managed", "Mono.Cecil.dll"),
-                Path.Combine(distancePath, "Distance_Data", "Managed", "install_linux.sh"),
-                Path.Combine(distancePath, "Distance_Data", "Managed", "install_windows.bat")
-            };
-
-            if (Directory.Exists(spectrumPath))
-                Directory.Delete(spectrumPath, true);
-
-            foreach (var path in additionalPaths)
-                if (File.Exists(path))
-                    File.Delete(path);
-
-            if (steamValidate)
-            {
-                await Task.Run(() =>
+                // TODO: Don't hardcode paths, preferably use validator service to retrieve some of this.
+                var spectrumPath = Path.Combine(distancePath, "Distance_Data", "Spectrum");
+                var additionalPaths = new List<string>
                 {
-                    Process.Start("steam://validate/233610").WaitForExit();
-                });
-            }
+                    Path.Combine(distancePath, "Distance_Data", "Managed", "Spectrum.Bootstrap.dll"),
+                    Path.Combine(distancePath, "Distance_Data", "Managed", "Spectrum.Prism.exe"),
+                    Path.Combine(distancePath, "Distance_Data", "Managed", "Mono.Cecil.dll"),
+                    Path.Combine(distancePath, "Distance_Data", "Managed", "install_linux.sh"),
+                    Path.Combine(distancePath, "Distance_Data", "Managed", "install_windows.bat")
+                };
+
+                if (Directory.Exists(spectrumPath))
+                    Directory.Delete(spectrumPath, true);
+
+                foreach (var path in additionalPaths)
+                    if (File.Exists(path))
+                        File.Delete(path);
+            });
         }
 
         public string GetRegisteredDistanceInstallationPath()

@@ -25,7 +25,6 @@ namespace Spectrum.Resonator.ViewModels
         public List<Release> AvailableReleases { get; set; }
         public Release PickedRelease { get; set; }
         public bool InstallingLocalPackage { get; set; }
-        public bool IsSteamRelease { get; set; }
         public string DistanceInstallationPath { get; set; }
         public string LocalPackagePath { get; set; }
 
@@ -65,10 +64,6 @@ namespace Spectrum.Resonator.ViewModels
             _validatorService = validatorService;
 
             DistanceInstallationPath = _spectrumInstallerService.GetRegisteredDistanceInstallationPath();
-
-            if (!string.IsNullOrWhiteSpace(DistanceInstallationPath))
-                IsSteamRelease = true;
-
             DownloadAvailableReleases();
         }
 
@@ -135,10 +130,10 @@ namespace Spectrum.Resonator.ViewModels
                     }
                     catch (IOException)
                     {
-                        var dialogResult = MessageBox.Show(owner, "Error", "Spectrum appears to have been already installed. Reinstall?", MessageBoxButton.YesNo);
+                        var dialogResult = MessageBox.Show(owner, "Spectrum appears to have been already installed. Reinstall?", "Spectrum already installed", MessageBoxButton.YesNo);
 
                         if (dialogResult == MessageBoxResult.Yes)
-                            await _spectrumInstallerService.UninstallSpectrum(DistanceInstallationPath, IsSteamRelease);
+                            await _spectrumInstallerService.UninstallSpectrum(DistanceInstallationPath);
                         else
                         {
                             _statusBarDataProvider.Reset();
@@ -148,18 +143,23 @@ namespace Spectrum.Resonator.ViewModels
                         _spectrumInstallerService.ExtractPackage(packagePath, DistanceInstallationPath);
                     }
 
+                    _statusBarDataProvider.SetActionInfo("Installing Spectrum...");
                     var result = await _spectrumInstallerService.InstallSpectrum(DistanceInstallationPath);
+
                     if (result != PrismTerminationReason.Default)
                     {
-                        MessageBox.Show(owner, "Installation failed.\nExit code: {(int)result}.\nReason: {result}.");
+                        MessageBox.Show(owner, "Installation failed.\nExit code: {(int)result}.\nReason: {result}.", "Error");
+                        return;
                     }
                 }
                 else
                 {
-                    // MessageBox, error, yadda yadda
+                    MessageBox.Show(owner, "The package you are trying to install has failed to validate properly.", "Error");
+                    return;
                 }
             }
 
+            MessageBox.Show(owner, "Spectrum is now installed.", "Success");
             _statusBarDataProvider.Reset();
         }
     }
