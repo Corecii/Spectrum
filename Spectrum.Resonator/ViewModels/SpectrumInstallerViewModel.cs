@@ -113,7 +113,7 @@ namespace Spectrum.Resonator.ViewModels
             if (InstallingLocalPackage)
             {
                 _statusBarDataProvider.SetActionInfo("Installing local package...");
-                await _spectrumInstallerService.InstallPackage(LocalPackagePath, DistanceInstallationPath);
+                await _spectrumInstallerService.ExtractPackage(LocalPackagePath, DistanceInstallationPath);
             }
             else
             {
@@ -123,7 +123,7 @@ namespace Spectrum.Resonator.ViewModels
                 if (_validatorService.ValidateZipArchive(packagePath, ArchiveValidatorName))
                 {
                     _statusBarDataProvider.SetActionInfo("Installing release package...");
-                    await _spectrumInstallerService.InstallPackage(packagePath, DistanceInstallationPath);
+                    await _spectrumInstallerService.ExtractPackage(packagePath, DistanceInstallationPath);
                 }
                 else
                 {
