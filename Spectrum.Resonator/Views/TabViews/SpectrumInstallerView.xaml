@@ -160,6 +160,7 @@
                       Margin="0,8,0,0"
                       HorizontalAlignment="Right"
                       Command="{Binding BeginInstallationCommand}"
+                      CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type atlas:Window}}}"
                       Content="Begin installation"
                       IsEnabled="{Binding IsInstallationPossible}" />
     </Grid>

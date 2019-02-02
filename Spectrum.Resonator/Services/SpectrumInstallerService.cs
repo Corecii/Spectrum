@@ -1,7 +1,9 @@
 ﻿using Microsoft.Win32;
 using Octokit;
+using Spectrum.Resonator.Enums;
 using Spectrum.Resonator.Services.Interfaces;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -33,18 +35,56 @@ namespace Spectrum.Resonator.Services
             return new List<Release>(await GitHubClient.Repository.Release.GetAll("Ciastex", "Spectrum"));
         }
 
-        public async Task ExtractPackage(string sourcePath, string distancePath)
+        public async Task<PrismTerminationReason> InstallSpectrum(string distancePath, string customPrismArguments = null)
         {
-            // Only call this when you've validated the package before.
-            // Otherwise bad stuff will happen.
+            var prismProcess = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    Arguments = customPrismArguments ?? "-t Assembly-CSharp.dll -s Spectrum.Bootstrap.dll",
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    WorkingDirectory = Path.Combine(distancePath, "Distance_Data", "Managed"),
+                    FileName = Path.Combine(distancePath, "Distance_Data", "Managed", "Spectrum.Prism.exe")
+                }
+            };
 
-            using (var zipArchive = await Task.Run(() => ZipFile.OpenRead(sourcePath)))
-                await Task.Run(() => zipArchive.ExtractToDirectory(Path.Combine(distancePath, "Distance_Data")));
+            await Task.Run(() =>
+            {
+                prismProcess.Start();
+                prismProcess.WaitForExit();
+            });
+
+            return (PrismTerminationReason)prismProcess.ExitCode;
         }
 
-        public Task InstallSpectrum(string distancePath)
+        public async Task UninstallSpectrum(string distancePath, bool steamValidate)
         {
-            throw new System.NotImplementedException();
+            // TODO: Don't hardcode paths, preferably use validator service to retrieve some of this.
+            var spectrumPath = Path.Combine(distancePath, "Distance_Data", "Spectrum");
+            var additionalPaths = new List<string>
+            {
+                Path.Combine(distancePath, "Distance_Data", "Managed", "Spectrum.Bootstrap.dll"),
+                Path.Combine(distancePath, "Distance_Data", "Managed", "Spectrum.Prism.exe"),
+                Path.Combine(distancePath, "Distance_Data", "Managed", "Mono.Cecil.dll"),
+                Path.Combine(distancePath, "Distance_Data", "Managed", "install_linux.sh"),
+                Path.Combine(distancePath, "Distance_Data", "Managed", "install_windows.bat")
+            };
+
+            if (Directory.Exists(spectrumPath))
+                Directory.Delete(spectrumPath, true);
+
+            foreach (var path in additionalPaths)
+                if (File.Exists(path))
+                    File.Delete(path);
+
+            if (steamValidate)
+            {
+                await Task.Run(() =>
+                {
+                    Process.Start("steam://validate/233610").WaitForExit();
+                });
+            }
         }
 
         public string GetRegisteredDistanceInstallationPath()
@@ -66,6 +106,13 @@ namespace Spectrum.Resonator.Services
             return installationPath;
         }
 
+        public void ExtractPackage(string sourcePath, string distancePath)
+        {
+            // Only call this when you've validated the package before.
+            // Otherwise bad stuff will happen.
 
+            using (var zipArchive = ZipFile.OpenRead(sourcePath))
+                zipArchive.ExtractToDirectory(Path.Combine(distancePath, "Distance_Data"));
+        }
     }
 }

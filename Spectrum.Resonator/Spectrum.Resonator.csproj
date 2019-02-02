@@ -115,6 +115,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Enums\PrismTerminationReason.cs" />
     <Compile Include="Infrastructure\Markers\Interfaces\IProvider.cs" />
     <Compile Include="Infrastructure\Markers\Interfaces\IService.cs" />
     <Compile Include="Infrastructure\MarkupExtensions\DataContextSource.cs" />

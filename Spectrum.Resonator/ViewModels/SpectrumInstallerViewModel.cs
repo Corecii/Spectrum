@@ -1,10 +1,12 @@
 ﻿using DevExpress.Mvvm;
 using DevExpress.Mvvm.DataAnnotations;
 using Octokit;
+using Spectrum.Resonator.Enums;
 using Spectrum.Resonator.Models;
 using Spectrum.Resonator.Providers.Interfaces;
 using Spectrum.Resonator.Services.Interfaces;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows;
 
@@ -23,6 +25,7 @@ namespace Spectrum.Resonator.ViewModels
         public List<Release> AvailableReleases { get; set; }
         public Release PickedRelease { get; set; }
         public bool InstallingLocalPackage { get; set; }
+        public bool IsSteamRelease { get; set; }
         public string DistanceInstallationPath { get; set; }
         public string LocalPackagePath { get; set; }
 
@@ -51,7 +54,7 @@ namespace Spectrum.Resonator.ViewModels
             }
         }
 
-        public SpectrumInstallerViewModel(IBrowseDialogService browseDialogService, 
+        public SpectrumInstallerViewModel(IBrowseDialogService browseDialogService,
                                           ISpectrumInstallerService spectrumInstallerService,
                                           IStatusBarDataProvider statusBarDataProvider,
                                           IValidatorService validatorService)
@@ -62,6 +65,9 @@ namespace Spectrum.Resonator.ViewModels
             _validatorService = validatorService;
 
             DistanceInstallationPath = _spectrumInstallerService.GetRegisteredDistanceInstallationPath();
+
+            if (!string.IsNullOrWhiteSpace(DistanceInstallationPath))
+                IsSteamRelease = true;
 
             DownloadAvailableReleases();
         }
@@ -113,7 +119,7 @@ namespace Spectrum.Resonator.ViewModels
             if (InstallingLocalPackage)
             {
                 _statusBarDataProvider.SetActionInfo("Installing local package...");
-                await _spectrumInstallerService.ExtractPackage(LocalPackagePath, DistanceInstallationPath);
+                _spectrumInstallerService.ExtractPackage(LocalPackagePath, DistanceInstallationPath);
             }
             else
             {
@@ -122,8 +128,31 @@ namespace Spectrum.Resonator.ViewModels
 
                 if (_validatorService.ValidateZipArchive(packagePath, ArchiveValidatorName))
                 {
-                    _statusBarDataProvider.SetActionInfo("Installing release package...");
-                    await _spectrumInstallerService.ExtractPackage(packagePath, DistanceInstallationPath);
+                    _statusBarDataProvider.SetActionInfo("Extracting release package...");
+                    try
+                    {
+                        _spectrumInstallerService.ExtractPackage(packagePath, DistanceInstallationPath);
+                    }
+                    catch (IOException)
+                    {
+                        var dialogResult = MessageBox.Show(owner, "Error", "Spectrum appears to have been already installed. Reinstall?", MessageBoxButton.YesNo);
+
+                        if (dialogResult == MessageBoxResult.Yes)
+                            await _spectrumInstallerService.UninstallSpectrum(DistanceInstallationPath, IsSteamRelease);
+                        else
+                        {
+                            _statusBarDataProvider.Reset();
+                            return;
+                        }
+
+                        _spectrumInstallerService.ExtractPackage(packagePath, DistanceInstallationPath);
+                    }
+
+                    var result = await _spectrumInstallerService.InstallSpectrum(DistanceInstallationPath);
+                    if (result != PrismTerminationReason.Default)
+                    {
+                        MessageBox.Show(owner, "Installation failed.\nExit code: {(int)result}.\nReason: {result}.");
+                    }
                 }
                 else
                 {
