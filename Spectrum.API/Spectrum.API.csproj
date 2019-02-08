@@ -59,7 +59,10 @@
     <Compile Include="Exceptions\MetadataReadException.cs" />
     <Compile Include="Exceptions\SettingsException.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
+    <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="IPC\PluginInfo.cs" />
+    <Compile Include="Reflection\MemberMetadata.cs" />
+    <Compile Include="Security\CheatMode.cs" />
     <Compile Include="Storage\Assets.cs" />
     <Compile Include="Storage\FileSystem.cs" />
     <Compile Include="Input\Hotkey.cs" />
