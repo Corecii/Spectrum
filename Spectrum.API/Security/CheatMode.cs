@@ -2,32 +2,38 @@
 using Events.Scene;
 using Spectrum.API.Extensions;
 using Spectrum.API.Reflection;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Spectrum.API.Security
 {
     public class CheatMode
     {
-        private static SubscriberList _subscriberList;
-        private static bool _cheatsEnabled;
+        private static readonly Dictionary<Assembly, bool> _cheatStates;
 
         static CheatMode()
         {
-            _subscriberList = new SubscriberList
-            {
-                new StaticEvent<LoadFinish.Data>.Subscriber((data) => OnSceneLoadFinished(data))
-            };
+            _cheatStates = new Dictionary<Assembly, bool>();
+            LoadFinish.Subscribe((data) => OnSceneLoadFinished(data));
         }
 
         public static void Enable()
         {
-            _cheatsEnabled = true;
-            _subscriberList.Subscribe();
+            var callingAssembly = Assembly.GetCallingAssembly();
+
+            if (!_cheatStates.ContainsKey(callingAssembly))
+                _cheatStates.Add(callingAssembly, true);
+            else
+                _cheatStates[callingAssembly] = true;
         }
 
         public static void Disable()
         {
-            _cheatsEnabled = false;
-            _subscriberList.Unsubscribe();
+            var callingAssembly = Assembly.GetCallingAssembly();
+
+            if (_cheatStates.ContainsKey(callingAssembly))
+                _cheatStates[callingAssembly] = false;
         }
 
         private static void OnSceneLoadFinished(LoadFinish.Data data)
@@ -37,7 +43,7 @@ namespace Spectrum.API.Security
                 IsProperty = false,
                 IsStatic = false,
                 MemberName = "anyGameplayCheatsUsedThisLevel_"
-            }, _cheatsEnabled);
+            }, _cheatStates.Values.Contains(true));
         }
     }
 }
