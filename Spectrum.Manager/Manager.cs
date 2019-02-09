@@ -1,13 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Events;
+using Events.ChatLog;
+using Events.ClientToAllClients;
 using Spectrum.API;
 using Spectrum.API.Configuration;
-using Spectrum.API.Events;
+using Spectrum.API.Events.EventArgs;
 using Spectrum.API.Interfaces.Plugins;
 using Spectrum.API.Interfaces.Systems;
 using Spectrum.API.IPC;
 using Spectrum.API.Logging;
+using Spectrum.API.Network;
+using Spectrum.API.Network.Events;
+using Spectrum.API.Security;
 using Spectrum.Manager.Input;
 using Spectrum.Manager.Runtime;
 
@@ -20,7 +26,9 @@ namespace Spectrum.Manager
         private Logger Log { get; }
 
         public event EventHandler<PluginInitializationEventArgs> PluginInitialized;
-        public IHotkeyManager Hotkeys { get; set; }
+        public IHotkeyManager Hotkeys { get; }
+        public IEventRouter EventRouter { get; }
+        public ICheatSystem CheatSystem { get; }
 
         public bool IsEnabled { get; set; } = true;
         public bool CanLoadPlugins => Directory.Exists(Defaults.ManagerPluginDirectory);
@@ -41,10 +49,53 @@ namespace Spectrum.Manager
                 return;
             }
 
+            InitializeNetworkOverrides();
+
+            EventRouter = new EventRouter();
             Hotkeys = new HotkeyManager();
+            CheatSystem = new CheatSystem(this);
+
+            CheatSystem.CheatStateInfoReceived += (sender, args) =>
+            {
+                if (!G.Sys.NetworkingManager_.IsServer_) return;
+
+                if (args.CheatStateInfo.AnyCheatsEnabled)
+                {
+                    if (!Global.Settings.GetItem<bool>("AllowCheatsOnline"))
+                    {
+#pragma warning disable 618
+                        StaticTransceivedEvent<ChatMessage.Data>.Broadcast(new ChatMessage.Data("[FF44FF]Player disconnected due to cheats not being allowed in this game.[-]"));
+#pragma warning restore 618
+                        UnityEngine.Network.CloseConnection(args.Sender, true);
+                    }
+                }
+            };
+
+            CheatSystem.CheatStateInfoFailure += (sender, args) =>
+            {
+                if (!G.Sys.NetworkingManager_.IsServer_) return;
+
+                if (Global.Settings.GetItem<bool>("KickCheatRequestFailures"))
+                {
+#pragma warning disable 618
+                    StaticTransceivedEvent<ChatMessage.Data>.Broadcast(new ChatMessage.Data("[FF44FF]Player disconnected because of cheat state verification failure.[-]"));
+#pragma warning restore 618
+                    UnityEngine.Network.CloseConnection(args.Sender, true);
+                }
+            };
 
             LoadExtensions();
             StartExtensions();
+        }
+
+        private void InitializeNetworkOverrides()
+        {
+            Log.Info("Initializing network overrides...");
+
+            NetworkOverrides.RegisterBroadcastAllEvent<BroadcastAll.Data>();
+            NetworkOverrides.RegisterClientToServerEvent<ClientToServer.Data>();
+            NetworkOverrides.RegisterServerToClientEvent<ServerToClient.Data>();
+            NetworkOverrides.RegisterTargetedEvent<ServerToClient.Data>();
         }
 
         public void SendIPC(string ipcIdentifierTo, IPCData data)
@@ -145,6 +196,8 @@ namespace Spectrum.Manager
 
                 Global.Settings.GetOrCreate("LogToConsole", true);
                 Global.Settings.GetOrCreate("Enabled", true);
+                Global.Settings.GetOrCreate("AllowCheatsOnline", false);
+                Global.Settings.GetOrCreate("KickCheatRequestFailures", true);
 
                 if (Global.Settings.Dirty)
                     Global.Settings.Save();
