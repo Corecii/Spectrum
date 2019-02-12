@@ -68,6 +68,24 @@ namespace Spectrum.API.Extensions
             return retval;
         }
 
+        public static void CallPrivateMethod(this object obj, MethodMetadata metadata, params object[] parameters)
+        {
+            var flags = BindingFlags.NonPublic;
+
+            if (!metadata.IsStatic)
+                flags |= BindingFlags.Instance;
+            else
+                flags |= BindingFlags.Static;
+
+            var methodInfo = obj.GetType().GetMethod(metadata.Name, flags);
+
+            if (methodInfo == null) return;
+
+            methodInfo.Invoke(metadata.IsStatic ? null : obj, parameters);
+
+            Console.WriteLine($"Invoked method {metadata.Name} on {obj.GetType()} (non-generic).");
+        }
+
         public static void CallPrivateGenericMethod<T>(this object obj, MethodMetadata metadata, params object[] parameters)
         {
             var flags = BindingFlags.NonPublic;
@@ -84,7 +102,7 @@ namespace Spectrum.API.Extensions
             var genericMethod = methodInfo.MakeGenericMethod(typeof(T));
             genericMethod.Invoke(metadata.IsStatic ? null : obj, parameters);
 
-            Console.WriteLine($"Invoked method {metadata.Name} for type {typeof(T)}.");
+            Console.WriteLine($"Invoked method {metadata.Name} on {obj.GetType()} for generic type {typeof(T)}.");
         }
     }
 }

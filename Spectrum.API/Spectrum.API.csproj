@@ -71,6 +71,7 @@
     <Compile Include="Network\Events\ClientToServer.cs" />
     <Compile Include="Network\Events\ServerToClient.cs" />
     <Compile Include="Network\NetworkOverrides.cs" />
+    <Compile Include="Network\NetworkProtected.cs" />
     <Compile Include="Reflection\MemberMetadata.cs" />
     <Compile Include="Reflection\MethodMetadata.cs" />
     <Compile Include="Security\CheatStateInfo.cs" />

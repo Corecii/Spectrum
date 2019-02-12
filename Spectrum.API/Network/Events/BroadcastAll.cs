@@ -13,13 +13,13 @@ namespace Spectrum.API.Network.Events
 
             public NetworkGroup NetworkGroup_ { get; }
 
-            public Data(string eventName, string eventData)
+            public Data(string eventName, string eventData, NetworkGroup networkGroup = NetworkGroup.GlobalGroup)
             {
                 EventName = eventName;
                 EventData = eventData;
                 Sender = UnityEngine.Network.player;
 
-                NetworkGroup_ = NetworkGroup.GlobalGroup;
+                NetworkGroup_ = networkGroup;
             }
 
             void IBitSerializable.Serialize(BitStreamAbstract stream)

@@ -8,9 +8,9 @@ namespace Spectrum.API.Network
     {
         internal static void RegisterServerToClientEvent<T>() where T : struct, IBitSerializable, INetworkGrouped
         {
-            var serverToClientTranscieverInstance = GameObject.FindObjectOfType<ServerToClientNetworkTransceiver>();
+            var transcieverInstance = GameObject.FindObjectOfType<ServerToClientNetworkTransceiver>();
 
-            (serverToClientTranscieverInstance as NetworkStaticEventTransceiver)
+            (transcieverInstance as NetworkStaticEventTransceiver)
                 .CallPrivateGenericMethod<T>(new MethodMetadata
                 {
                     IsStatic = false,
@@ -20,9 +20,9 @@ namespace Spectrum.API.Network
 
         internal static void RegisterTargetedEvent<T>() where T : struct, IBitSerializable, INetworkGrouped
         {
-            var serverToClientTranscieverInstance = GameObject.FindObjectOfType<ServerToClientNetworkTransceiver>();
+            var transcieverInstance = GameObject.FindObjectOfType<ServerToClientNetworkTransceiver>();
 
-            (serverToClientTranscieverInstance as NetworkStaticEventTransceiver)
+            (transcieverInstance as NetworkStaticEventTransceiver)
                 .CallPrivateGenericMethod<T>(new MethodMetadata
                 {
                     IsStatic = false,
@@ -32,9 +32,9 @@ namespace Spectrum.API.Network
 
         internal static void RegisterClientToServerEvent<T>() where T : struct, IBitSerializable, INetworkGrouped
         {
-            var clientToServerTranscieverInstance = GameObject.FindObjectOfType<ClientToServerNetworkTransceiver>();
+            var transcieverInstance = GameObject.FindObjectOfType<ClientToServerNetworkTransceiver>();
 
-            (clientToServerTranscieverInstance as NetworkStaticEventTransceiver)
+            (transcieverInstance as NetworkStaticEventTransceiver)
                 .CallPrivateGenericMethod<T>(new MethodMetadata
                 {
                     IsStatic = false,
@@ -44,9 +44,9 @@ namespace Spectrum.API.Network
 
         internal static void RegisterBroadcastAllEvent<T>() where T : struct, IBitSerializable, INetworkGrouped
         {
-            var clientToServerTranscieverInstance = GameObject.FindObjectOfType<ClientToClientNetworkTransceiver>();
+            var transcieverInstance = GameObject.FindObjectOfType<ClientToClientNetworkTransceiver>();
 
-            (clientToServerTranscieverInstance as NetworkStaticEventTransceiver)
+            (transcieverInstance as NetworkStaticEventTransceiver)
                 .CallPrivateGenericMethod<T>(new MethodMetadata
                 {
                     IsStatic = false,

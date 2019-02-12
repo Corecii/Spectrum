@@ -77,25 +77,12 @@ namespace Spectrum.API.Security
 
         private void OnClientConnected(ClientConnected.Data data)
         {
-            StaticTargetedEvent<ServerToClient.Data>.Broadcast(
-                data.player_,
-                new ServerToClient.Data(
-                    EventNames.CheatStateInfoRequest,
-                    string.Empty
-                )
-            );
+            Manager.EventRouter.FireServerToClient(EventNames.CheatStateInfoRequest, string.Empty, new NetworkTarget(data.player_));
         }
 
         private void OnCheatStateInfoRequested(NetworkPlayer sender, string json)
         {
-#pragma warning disable 0618
-            StaticTransceivedEvent<ClientToServer.Data>.Broadcast(
-#pragma warning restore 0618
-                new ClientToServer.Data(
-                    EventNames.CheatStateInfoResponse,
-                    JsonConvert.SerializeObject(new CheatStateInfo(AnyCheatsEnabled))
-                )
-            );
+            Manager.EventRouter.FireClientToServer(EventNames.CheatStateInfoResponse, JsonConvert.SerializeObject(new CheatStateInfo(AnyCheatsEnabled)));
         }
 
         private void OnCheatStateInfoReceived(NetworkPlayer sender, string json)

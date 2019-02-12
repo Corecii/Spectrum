@@ -49,7 +49,7 @@ namespace Spectrum.Manager
                 return;
             }
 
-            InitializeNetworkOverrides();
+            InitializeNetworking();
 
             EventRouter = new EventRouter();
             Hotkeys = new HotkeyManager();
@@ -88,7 +88,7 @@ namespace Spectrum.Manager
             StartExtensions();
         }
 
-        private void InitializeNetworkOverrides()
+        private void InitializeNetworking()
         {
             Log.Info("Initializing network overrides...");
 
@@ -96,6 +96,9 @@ namespace Spectrum.Manager
             NetworkOverrides.RegisterClientToServerEvent<ClientToServer.Data>();
             NetworkOverrides.RegisterServerToClientEvent<ServerToClient.Data>();
             NetworkOverrides.RegisterTargetedEvent<ServerToClient.Data>();
+
+            NetworkProtected.Init();
+
         }
 
         public void SendIPC(string ipcIdentifierTo, IPCData data)
