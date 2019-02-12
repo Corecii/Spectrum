@@ -89,7 +89,7 @@ namespace Spectrum.API.Network
         }
         public void FireServerToClient(string name, string data, NetworkGroup group = NetworkGroup.GlobalGroup)
         {
-            FireServerToClient(name, data, group);
+            FireServerToClient(name, data, ServerToClientNetworkTarget, group);
         }
 
         public void FireServerToClient(string name, Action<BitStreamAbstract> serializeData, NetworkTarget target, NetworkGroup group = NetworkGroup.GlobalGroup)
