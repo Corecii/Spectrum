@@ -19,6 +19,12 @@ namespace Spectrum.API.Network
         public NetworkTarget ServerToClientNetworkTarget;
         public NetworkTarget BroadcastAllNetworkTarget;
 
+        internal int ClientToServerIndex;
+        internal int ServerToClientIndex;
+        internal int BroadcastAllIndex;
+
+        internal bool HasInit = false;
+
         internal EventRouter()
         {
             ClientToServerCallbacks = new Dictionary<string, List<Action<NetworkPlayer, string>>>();
@@ -32,6 +38,16 @@ namespace Spectrum.API.Network
             ClientToServer.Subscribe(ClientToServerEventReceived);
             ServerToClient.Subscribe(ServerToClientEventReceived);
             BroadcastAll.Subscribe(BroadcastAllEventReceived);
+        }
+
+        public void Init()
+        {
+            if (HasInit)
+                return;
+            HasInit = true;
+            ClientToServerIndex = NetworkOverrides.RegisterClientToServerEvent<ClientToServer.Data>();
+            ServerToClientIndex = NetworkOverrides.RegisterServerToClientEvent<ServerToClient.Data>();
+            BroadcastAllIndex = NetworkOverrides.RegisterBroadcastAllEvent<BroadcastAll.Data>();
         }
 
         public void RegisterClientToServerCallback(string eventName, Action<NetworkPlayer, string> callback)
@@ -85,7 +101,7 @@ namespace Spectrum.API.Network
             {
                 IsStatic = false,
                 Name = "BroadcastEventRPC"
-            }, group, "ReceiveServerToClientEvent", target, eventData);
+            }, group, "ReceiveServerToClientEvent", target, ServerToClientIndex, eventData);
         }
         public void FireServerToClient(string name, string data, NetworkGroup group = NetworkGroup.GlobalGroup)
         {
@@ -105,7 +121,8 @@ namespace Spectrum.API.Network
             NetworkProtected.ServerToClientTransceiver.CallPrivateMethod(new MethodMetadata()
             {
                 IsStatic = false,
-                Name = "SendRPC"
+                Name = "SendRPC",
+                Types = new Type[] {typeof(NetworkGroup), typeof(string), typeof(NetworkTarget), typeof(object[])}
             }, group, "ReceiveServerToClientEvent", target, streamWriter.ToBytes());
         }
         public void FireServerToClient(string name, Action<BitStreamAbstract> serializeData, NetworkGroup group = NetworkGroup.GlobalGroup)
@@ -121,11 +138,11 @@ namespace Spectrum.API.Network
             {
                 BroadcastAllEventReceived(eventData);
             }
-            NetworkProtected.ClientToServerTransceiver.CallPrivateMethod(new MethodMetadata()
+            NetworkProtected.ClientToClientTransceiver.CallPrivateMethod(new MethodMetadata()
             {
                 IsStatic = false,
                 Name = "BroadcastEventRPC"
-            }, group, "ReceiveClientToServerEvent", target, eventData);
+            }, group, "ReceiveBroadcastAllEvent", target, BroadcastAllIndex, eventData);
         }
         public void FireBroadcastAll(string name, string data, NetworkGroup group = NetworkGroup.GlobalGroup)
         {
@@ -145,8 +162,9 @@ namespace Spectrum.API.Network
             NetworkProtected.ClientToClientTransceiver.CallPrivateMethod(new MethodMetadata()
             {
                 IsStatic = false,
-                Name = "SendRPC"
-            }, group, "ReceiveClientToServerEvent", target, streamWriter.ToBytes());
+                Name = "SendRPC",
+                Types = new Type[] { typeof(NetworkGroup), typeof(string), typeof(NetworkTarget), typeof(object[]) }
+            }, group, "ReceiveBroadcastAllEvent", target, streamWriter.ToBytes());
         }
         public void FireBroadcastAll(string name, Action<BitStreamAbstract> serializeData, NetworkGroup group = NetworkGroup.GlobalGroup)
         {
@@ -165,11 +183,11 @@ namespace Spectrum.API.Network
             {
                 IsStatic = false,
                 Name = "BroadcastEventRPC"
-            }, group, "ReceiveClientToServerEvent", target, eventData);
+            }, group, "ReceiveClientToServerEvent", target, ClientToServerIndex, eventData);
         }
         public void FireClientToServer(string name, string data, NetworkGroup group = NetworkGroup.GlobalGroup)
         {
-            FireClientToServer(name, data, group);
+            FireClientToServer(name, data, ClientToServerNetworkTarget, group);
         }
 
         public void FireClientToServer(string name, Action<BitStreamAbstract> serializeData, NetworkTarget target, NetworkGroup group = NetworkGroup.GlobalGroup)
@@ -185,7 +203,8 @@ namespace Spectrum.API.Network
             NetworkProtected.ClientToServerTransceiver.CallPrivateMethod(new MethodMetadata()
             {
                 IsStatic = false,
-                Name = "SendRPC"
+                Name = "SendRPC",
+                Types = new Type[] { typeof(NetworkGroup), typeof(string), typeof(NetworkTarget), typeof(object[]) }
             }, group, "ReceiveClientToServerEvent", target, streamWriter.ToBytes());
         }
         public void FireClientToServer(string name, Action<BitStreamAbstract> serializeData, NetworkGroup group = NetworkGroup.GlobalGroup)

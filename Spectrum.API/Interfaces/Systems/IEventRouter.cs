@@ -5,6 +5,7 @@ namespace Spectrum.API.Interfaces.Systems
 {
     public interface IEventRouter
     {
+        void Init();
         void RegisterClientToServerCallback(string eventName, Action<NetworkPlayer, string> callback);
         void RegisterServerToClientCallback(string eventName, Action<NetworkPlayer, string> callback);
         void RegisterBroadcastAllCallback(string eventName, Action<NetworkPlayer, string> callback);

@@ -6,52 +6,56 @@ namespace Spectrum.API.Network
 {
     public static class NetworkOverrides
     {
-        internal static void RegisterServerToClientEvent<T>() where T : struct, IBitSerializable, INetworkGrouped
+        internal static int RegisterServerToClientEvent<T>() where T : struct, IBitSerializable, INetworkGrouped
         {
-            var transcieverInstance = GameObject.FindObjectOfType<ServerToClientNetworkTransceiver>();
+            var transceiverInstance = GameObject.FindObjectOfType<ServerToClientNetworkTransceiver>();
 
-            (transcieverInstance as NetworkStaticEventTransceiver)
+            (transceiverInstance as NetworkStaticEventTransceiver)
                 .CallPrivateGenericMethod<T>(new MethodMetadata
                 {
                     IsStatic = false,
                     Name = "RegisterServerToClientEvent"
                 });
+            return NetworkProtected.GetListCount(transceiverInstance) - 1;
         }
 
-        internal static void RegisterTargetedEvent<T>() where T : struct, IBitSerializable, INetworkGrouped
+        internal static int RegisterTargetedEvent<T>() where T : struct, IBitSerializable, INetworkGrouped
         {
-            var transcieverInstance = GameObject.FindObjectOfType<ServerToClientNetworkTransceiver>();
+            var transceiverInstance = GameObject.FindObjectOfType<ServerToClientNetworkTransceiver>();
 
-            (transcieverInstance as NetworkStaticEventTransceiver)
+            (transceiverInstance as NetworkStaticEventTransceiver)
                 .CallPrivateGenericMethod<T>(new MethodMetadata
                 {
                     IsStatic = false,
                     Name = "RegisterTargetedEvent"
                 });
+            return NetworkProtected.GetListCount(transceiverInstance) - 1;
         }
 
-        internal static void RegisterClientToServerEvent<T>() where T : struct, IBitSerializable, INetworkGrouped
+        internal static int RegisterClientToServerEvent<T>() where T : struct, IBitSerializable, INetworkGrouped
         {
-            var transcieverInstance = GameObject.FindObjectOfType<ClientToServerNetworkTransceiver>();
+            var transceiverInstance = GameObject.FindObjectOfType<ClientToServerNetworkTransceiver>();
 
-            (transcieverInstance as NetworkStaticEventTransceiver)
+            (transceiverInstance as NetworkStaticEventTransceiver)
                 .CallPrivateGenericMethod<T>(new MethodMetadata
                 {
                     IsStatic = false,
                     Name = "RegisterClientToServerEvent"
                 });
+            return NetworkProtected.GetListCount(transceiverInstance) - 1;
         }
 
-        internal static void RegisterBroadcastAllEvent<T>() where T : struct, IBitSerializable, INetworkGrouped
+        internal static int RegisterBroadcastAllEvent<T>() where T : struct, IBitSerializable, INetworkGrouped
         {
-            var transcieverInstance = GameObject.FindObjectOfType<ClientToClientNetworkTransceiver>();
+            var transceiverInstance = GameObject.FindObjectOfType<ClientToClientNetworkTransceiver>();
 
-            (transcieverInstance as NetworkStaticEventTransceiver)
+            (transceiverInstance as NetworkStaticEventTransceiver)
                 .CallPrivateGenericMethod<T>(new MethodMetadata
                 {
                     IsStatic = false,
                     Name = "RegisterBroadcastAllEvent"
                 });
+            return NetworkProtected.GetListCount(transceiverInstance) - 1;
         }
     }
 }

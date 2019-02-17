@@ -16,9 +16,11 @@ namespace Spectrum.API.Extensions
             else
                 flags |= BindingFlags.Static;
 
+            Type type = metadata.Type ?? obj.GetType();
+
             if (metadata.IsProperty)
             {
-                var propertyInfo = obj.GetType().GetProperty(metadata.MemberName, flags);
+                var propertyInfo = type.GetProperty(metadata.MemberName, flags);
 
                 if (propertyInfo == null) return;
                 if (!propertyInfo.CanWrite) return;
@@ -28,7 +30,7 @@ namespace Spectrum.API.Extensions
             }
             else
             {
-                var fieldInfo = obj.GetType().GetField(metadata.MemberName, flags);
+                var fieldInfo = type.GetField(metadata.MemberName, flags);
 
                 if (fieldInfo == null) return;
 
@@ -46,9 +48,11 @@ namespace Spectrum.API.Extensions
             else
                 flags |= BindingFlags.Static;
 
+            Type type = metadata.Type ?? obj.GetType();
+
             if (metadata.IsProperty)
             {
-                var propertyInfo = obj.GetType().GetProperty(metadata.MemberName, flags);
+                var propertyInfo = type.GetProperty(metadata.MemberName, flags);
 
                 if (propertyInfo == null) return default(T);
                 if (!propertyInfo.CanRead) return default(T);
@@ -58,7 +62,7 @@ namespace Spectrum.API.Extensions
             }
             else
             {
-                var fieldInfo = obj.GetType().GetField(metadata.MemberName, flags);
+                var fieldInfo = type.GetField(metadata.MemberName, flags);
 
                 if (fieldInfo == null) return default(T);
 
@@ -77,7 +81,12 @@ namespace Spectrum.API.Extensions
             else
                 flags |= BindingFlags.Static;
 
-            var methodInfo = obj.GetType().GetMethod(metadata.Name, flags);
+            MethodInfo methodInfo;
+            
+            if (metadata.Types != null)
+                methodInfo = obj.GetType().GetMethod(metadata.Name, flags, null, metadata.Types, null);
+            else
+                methodInfo = obj.GetType().GetMethod(metadata.Name, flags);
 
             if (methodInfo == null) return;
 
@@ -95,7 +104,12 @@ namespace Spectrum.API.Extensions
             else
                 flags |= BindingFlags.Static;
 
-            var methodInfo = obj.GetType().GetMethod(metadata.Name, flags);
+            MethodInfo methodInfo;
+
+            if (metadata.Types != null)
+                methodInfo = obj.GetType().GetMethod(metadata.Name, flags, null, metadata.Types, null);
+            else
+                methodInfo = obj.GetType().GetMethod(metadata.Name, flags);
 
             if (methodInfo == null) return;
 

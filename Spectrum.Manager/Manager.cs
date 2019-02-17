@@ -49,10 +49,12 @@ namespace Spectrum.Manager
                 return;
             }
 
-            InitializeNetworking();
-
             EventRouter = new EventRouter();
             Hotkeys = new HotkeyManager();
+
+            InitializeNetworking();
+
+            /*
             CheatSystem = new CheatSystem(this);
 
             CheatSystem.CheatStateInfoReceived += (sender, args) =>
@@ -83,6 +85,7 @@ namespace Spectrum.Manager
                     UnityEngine.Network.CloseConnection(args.Sender, true);
                 }
             };
+            */
 
             LoadExtensions();
             StartExtensions();
@@ -92,10 +95,7 @@ namespace Spectrum.Manager
         {
             Log.Info("Initializing network overrides...");
 
-            NetworkOverrides.RegisterBroadcastAllEvent<BroadcastAll.Data>();
-            NetworkOverrides.RegisterClientToServerEvent<ClientToServer.Data>();
-            NetworkOverrides.RegisterServerToClientEvent<ServerToClient.Data>();
-            NetworkOverrides.RegisterTargetedEvent<ServerToClient.Data>();
+            EventRouter.Init();
 
             NetworkProtected.Init();
 

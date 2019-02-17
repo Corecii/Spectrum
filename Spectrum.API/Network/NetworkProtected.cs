@@ -45,6 +45,17 @@ namespace Spectrum.API.Network
             ClientToClientTransceiver = GameObject.FindObjectOfType<ClientToClientNetworkTransceiver>();
         }
 
+        static internal int GetListCount(NetworkStaticEventTransceiver transceiver)
+        {
+            return (transceiver as NetworkStaticEventTransceiver).GetPrivateMember<List<SubscriberAbstract>>(new MemberMetadata()
+            {
+                MemberName = "list_",
+                IsProperty = false,
+                IsStatic = false,
+                Type = typeof(NetworkStaticEventTransceiver)
+            }).Count;
+        }
+
         static internal void RegisterClientToServerCallback(string name, Action<BitStreamAbstract> action)
         {
             ClientToServerCallbacks[name] = action;
